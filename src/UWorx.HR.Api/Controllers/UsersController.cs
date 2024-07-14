@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using UWorx.HR.Api.Services;
 using UWorx.HR.Repositories;
 
 namespace UWorx.HR.Api.Controllers
@@ -23,9 +24,7 @@ namespace UWorx.HR.Api.Controllers
         }
 
         [HttpPost]
-        [Route("/{guid}")]
-        public IActionResult UpdateUserByGuid([FromRoute] Guid guid,
-            [FromBody] HRUserInfo userInfo)
+        public IActionResult UpdateUser([FromBody] HRUserInfo userInfo)
         {
             return base.BadRequest();
         }
@@ -33,6 +32,14 @@ namespace UWorx.HR.Api.Controllers
         [HttpPost]
         [Route("/{userIndex}")]
         public IActionResult UpdateUserByIndex([FromRoute] int userIndex,
+            [FromBody] HRUserInfo userInfo)
+        {
+            return base.BadRequest();
+        }
+
+        [HttpPost]
+        [Route("/{guid}")]
+        public IActionResult UpdateUserByGuid([FromRoute] Guid guid,
             [FromBody] HRUserInfo userInfo)
         {
             return base.BadRequest();

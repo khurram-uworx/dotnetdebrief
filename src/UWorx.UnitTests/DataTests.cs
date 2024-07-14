@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using UWorx.HR.Data;
@@ -10,13 +11,13 @@ namespace HRTests
     [TestClass]
     public class DataTests
     {
-        readonly string testUser = "test@email.com";
-        readonly string connectionString = "Server=.;Database=HumanResources;Integrated Security=True;";
+        const string ConnectionString = "Server=.;Database=HumanResources;Integrated Security=True;";
         //TrustServerCertificate=True;Application Name=
+        string testUser = "test@email.com";
 
         public DataTests()
         {
-            using (var connection = new SqlConnection(connectionString))
+            using (var connection = new SqlConnection(ConnectionString))
             {
                 try
                 {
@@ -43,32 +44,38 @@ namespace HRTests
             }
         }
 
-        void usersRepositoryTests(IHRUsersRepository gateway)
+        void usersRepositoryTests(IHRUsersRepository repository)
         {
-            var userInfo = gateway.GetUserInformation(this.testUser);
-            Assert.IsTrue(null != userInfo);
-            Assert.IsTrue(userInfo.FirstName.Length > 0);
+            var list = new List<HRUserInfo>();
+            list.AddRange(repository.GetUsers());
 
-            bool pass1 = gateway.UpdatePassword(this.testUser, "NewRandomPassword1");
-            bool pass2 = gateway.UpdatePassword(this.testUser, "NewRandomPassword");
+            Assert.IsTrue(list.Count > 0);
+            Assert.IsTrue(list[0].FirstName.Length > 0);
+            
+            var queriedUser = list.Find(u => u.UserEmail == this.testUser);
+            Assert.IsTrue(null != queriedUser);
+            Assert.IsTrue(queriedUser.UserEmail == this.testUser);
+
+            bool pass1 = repository.UpdatePassword(this.testUser, "NewRandomPassword1");
+            bool pass2 = repository.UpdatePassword(this.testUser, "NewRandomPassword");
             Assert.IsTrue(pass1 || pass2); // one of this attempt should pass
 
-            bool name1 = gateway.UpdateName(this.testUser, "First Name 1", middleName: null, lastName: null);
-            bool name2 = gateway.UpdateName(this.testUser, "First Name", middleName: null, lastName: null);
+            bool name1 = repository.UpdateName(this.testUser, "First Name 1", middleName: null, lastName: null);
+            bool name2 = repository.UpdateName(this.testUser, "First Name", middleName: null, lastName: null);
             Assert.IsTrue(name1 || name2);
         }
 
         [TestMethod]
         public void SqlTestScenario()
         {
-            IHRUsersRepository repository = new SqlUsersRepository(this.connectionString);
+            IHRUsersRepository repository = new SqlUsersRepository(ConnectionString);
             usersRepositoryTests(repository);
         }
 
         [TestMethod]
         public void LinqSqlTestScenario()
         {
-            IHRUsersRepository repository = new LinqSqlUsersRepository(this.connectionString);
+            IHRUsersRepository repository = new LinqSqlUsersRepository(ConnectionString);
             usersRepositoryTests(repository);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.ApplicationBlocks.Data;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -16,26 +17,28 @@ namespace UWorx.HR.Data
             this.connectionString = connectionString;
         }
 
-        public HRUserInfo GetUserInformation(string email)
+        public IEnumerable<HRUserInfo> GetUsers()
         {
-            //var sql = "select FirstName, MiddleName, LastName from users where UserEmail = @email";
-            var sql = "select * from users where UserEmail = @email";
-            var reader = SqlHelper.ExecuteReader(connectionString, CommandType.Text,
-                sql, new[] { new SqlParameter("@email", email) });
+            //var sql = "select UserIndex, UserEmail, FirstName, MiddleName, LastName from users";
+            var sql = "select * from users";
+            var reader = SqlHelper.ExecuteReader(connectionString, CommandType.Text, sql);
+
+            var list = new List<HRUserInfo>();
 
             while (reader.Read())
             {
-                var info = new HRUserInfo()
+                list.Add(new HRUserInfo()
                 {
+                    UserGuid = Guid.NewGuid(),
+                    UserIndex = SqlReaderHelper.GetValue<int>(reader, "UserIndex"),
+                    UserEmail = SqlReaderHelper.GetValue<string>(reader, "UserEmail"),
                     FirstName = SqlReaderHelper.GetValue<string>(reader, "FirstName"),
                     MiddleName = SqlReaderHelper.GetValue<string>(reader, "MiddleName"),
                     LastName = SqlReaderHelper.GetValue<string>(reader, "LastName")
-                };
-
-                return info;
+                });
             }
 
-            return null;
+            return list;
         }
 
         public bool UpdatePassword(string email, string password)

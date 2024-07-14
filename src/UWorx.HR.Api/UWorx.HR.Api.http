@@ -4,3 +4,8 @@ GET {{UWorx.HR.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+http://localhost:5278/weatherforecast/
+Accept: application/json
+
+###

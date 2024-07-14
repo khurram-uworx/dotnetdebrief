@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UWorx.HR.Data.Linq;
 using UWorx.HR.Repositories;
 
@@ -13,25 +15,32 @@ namespace UWorx.HR.Data
             this.connectionString = connectionString;
         }
 
-        public HRUserInfo GetUserInformation(string email)
+        public IEnumerable<HRUserInfo> GetUsers()
         {
+            var list = new List<HRUserInfo>();
             using(var db = new HRDataClassesDataContext(this.connectionString))
             {
                 var q = from u in db.Users
-                        where u.UserEmail == email
-                        select new { u.FirstName, u.LastName };
-                var r = q.FirstOrDefault();
+                        select new { u.FirstName, u.LastName, u.UserEmail };
 
-                if (null != r)
-                    return new HRUserInfo()
+                int i = 1;
+                foreach(var r in q)
+                {
+                    list.Add(new HRUserInfo()
                     {
+                        UserIndex = i,
+                        UserGuid = Guid.NewGuid(),
+                        UserEmail = r.UserEmail,
                         FirstName = r.FirstName,
                         MiddleName = null,
                         LastName = r.LastName
-                    };
+                    });
+
+                    i++;
+                }
             }
 
-            return null;
+            return list;
         }
 
         public bool UpdateName(string email, string firstName, string middleName = null, string lastName = null)
