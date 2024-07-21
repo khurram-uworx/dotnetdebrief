@@ -4,6 +4,10 @@ using System.IO;
 
 namespace Framework.Helpers
 {
+    /// <summary>
+    /// https://en.wikipedia.org/wiki/Component_Object_Model
+    /// https://en.wikipedia.org/wiki/Windows_Script_Host
+    /// </summary>
     internal static class ShortcutHelper
     {
         public static string CreateDesktopShortcut(string targetPath, string shortcutName, string description = null)

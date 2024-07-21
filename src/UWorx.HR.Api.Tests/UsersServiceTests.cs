@@ -33,9 +33,8 @@ namespace UWorx.HR.Api.Tests
             var result = this.serviceUnderTest().GetUserInformationByEmail(TestUser);
 
             //Assert
-            Assert.IsTrue(!result.Succeeded);
-            
             this.repositoryMock.Verify(s => s.GetUsers(), Times.Once);
+            Assert.IsTrue(!result.Succeeded);
         }
 
         [Test]
@@ -43,17 +42,17 @@ namespace UWorx.HR.Api.Tests
         {
             //Arrange
             this.repositoryMock = new Mock<IHRUsersRepository>();
-            this.repositoryMock.Setup(s => s.GetUsers()).Returns(new[] { testUser1 });
+            this.repositoryMock.Setup(s => s.GetUsers())
+                .Returns(new[] { testUser1 });
 
             //Act
             var result = this.serviceUnderTest().GetUserInformationByEmail(TestUser);
             var data = result.Succeeded ? result as HRDataResult<HRUserResponse> : null;
 
             //Assert
+            this.repositoryMock.Verify(s => s.GetUsers(), Times.Once);
             Assert.IsTrue(result.Succeeded);
             Assert.IsTrue(null != data && data.Succeeded && null != data.Data && data.Data.FirstName.Length > 0);
-            
-            this.repositoryMock.Verify(s => s.GetUsers(), Times.Once);
         }
     }
 }
