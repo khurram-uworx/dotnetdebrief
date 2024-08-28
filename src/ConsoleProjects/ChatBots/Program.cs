@@ -9,16 +9,6 @@ internal static class Program
         //OpenAI.Run();
         //ML.MLTest();
 
-        //OpenAITools.ChatWithTools();
-
-        //await AutoGen.HelloWorldPhi3Async();
-        //await AutoGenChats.HelloAgents();   // not working because of .net version recent api changes
-        // https://microsoft.github.io/autogen-for-net/articles/Built-in-messages.html
-
-        //await SemanticKernelChats.HelloWorldAsync();
-        //await SemanticKernelChats.PromptScenarioAsync();
-        await SemanticKernelChats.LightsPluginAsync();          // User: Please toggle the light
-        //await SemanticKernelChats.RagScenarioAsync();         // not working because of Semantic kernel with ollama text embedding search does not return any value
-        // https://github.com/microsoft/semantic-kernel/issues/6483
+        OpenAITools.ChatWithTools();
     }
 }
