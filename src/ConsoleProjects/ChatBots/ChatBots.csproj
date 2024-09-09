@@ -9,12 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoGen" Version="0.0.17" />
-    <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.2" />
-    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.70.240803.1" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.4.0-rc1" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.18.0-rc" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.18.0-alpha" />
+    <PackageReference Include="AutoGen" Version="0.1.0" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.3" />
+    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.71.240820.1" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.4.0" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.18.1-rc" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.18.1-alpha" />
     <PackageReference Include="SmartComponents.LocalEmbeddings.SemanticKernel" Version="0.1.0-preview10148" />
   </ItemGroup>
 
