@@ -403,3 +403,5 @@ _*.txt
 _*.ipynb
 _*.png
 _*.jpg
+
+readings/*
