@@ -404,4 +404,4 @@ _*.ipynb
 _*.png
 _*.jpg
 
-readings/*
+src/ChatBots/Models/directml/*

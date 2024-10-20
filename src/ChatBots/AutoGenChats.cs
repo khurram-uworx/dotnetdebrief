@@ -4,9 +4,7 @@ using System.Net.Http;
 using System;
 using AutoGen.Ollama;
 using AutoGen.Ollama.Extension;
-using AutoGen.OpenAI;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace ChatBots;
 

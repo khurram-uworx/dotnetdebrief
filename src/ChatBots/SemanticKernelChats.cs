@@ -1,9 +1,5 @@
 ﻿#pragma warning disable SKEXP0001
-#pragma warning disable SKEXP0003
-#pragma warning disable SKEXP0010
-#pragma warning disable SKEXP0011
 #pragma warning disable SKEXP0050
-#pragma warning disable SKEXP0052
 
 using ChatBots.Plugins;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +19,7 @@ namespace ChatBots;
 
 internal static class SemanticKernelChats
 {
-    public static Kernel GetKernel(bool embedding = false)
+    public static Kernel GetKernel(Action<IKernelBuilder, OpenAIClient> action = null)
     {
         var options = new OpenAIClientOptions
         {
@@ -35,18 +31,14 @@ internal static class SemanticKernelChats
 
         // Create a chat completion service
         var builder = Kernel.CreateBuilder();
-        //builder.AddOpenAIChatCompletion(
-        //    modelId: "mistral", // doesnt support tools: llama2, phi3
-        //    endpoint: new Uri("http://localhost:11434/v1"), // Ollama
-        //    apiKey: "apikey");
         builder.AddOpenAIChatCompletion(
-            modelId: "mistral", // doesnt support tools: llama2, phi3
+            modelId: "mistral", // llama2, phi3 dont support tools
             openAIClient);
 
         // Add enterprise components
         builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Trace));
 
-        if (embedding) builder.AddLocalTextEmbeddingGeneration();
+        if (null != action) action(builder, openAIClient);
 
         return builder.Build();
     }
@@ -170,7 +162,7 @@ Give me a TLDR with the fewest words.";
         //https://elbruno.com/2024/06/17/full-rag-scenario-using-phi3-semantickernel-and-textmemory-in-local-mode/
         //https://techcommunity.microsoft.com/t5/educator-developer-blog/building-intelligent-applications-with-local-rag-in-net-and-phi/ba-p/4175721
 
-        var kernel = GetKernel(embedding: true);
+        var kernel = GetKernel((b, _) => b.AddLocalTextEmbeddingGeneration());
 
         var question = "What is Bruno's favourite super hero?";
         Console.WriteLine($"This program will answer the following question: {question}");
