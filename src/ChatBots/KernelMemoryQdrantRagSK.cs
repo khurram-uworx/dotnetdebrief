@@ -1,4 +1,5 @@
-﻿#pragma warning disable SKEXP0020
+﻿#pragma warning disable SKEXP0001
+#pragma warning disable SKEXP0020
 
 using ChatBots.Plugins;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,13 +35,16 @@ internal class KernelMemoryQdrantRagSK
         return answer.Result.Trim();
     }
 
-    private static async Task ChatLoop(IChatCompletionService chatService, string systemPrompt, IKernelMemory memory)
+    private static async Task ChatLoop(Kernel kernel, IKernelMemory memory,
+        string systemPrompt, bool isStreaming, 
+        PromptExecutionSettings settings = null)
     {
+        var chatService = kernel.GetRequiredService<IChatCompletionService>();
         var chatHistory = new ChatHistory(systemPrompt);
 
         // Start the chat
         var assistantMessage = "Hello, how can I help?";
-        Console.WriteLine($"Copilot> {assistantMessage}\n");
+        Console.WriteLine($"Assistant> {assistantMessage}\n");
         chatHistory.AddAssistantMessage(assistantMessage);
 
         // Infinite chat loop
@@ -61,13 +65,31 @@ internal class KernelMemoryQdrantRagSK
             // Inject the memory recall in the initial system message
             chatHistory[0].Content = $"{systemPrompt}\n\nLong term memory:\n{longTermMemory}";
 
-            // Generate the next chat message, stream the response
-            Console.Write("\nCopilot> ");
             reply.Clear();
-            await foreach (StreamingChatMessageContent stream in chatService.GetStreamingChatMessageContentsAsync(chatHistory))
+
+            // Get the response from the AI
+            if (isStreaming)
             {
-                Console.Write(stream.Content);
-                reply.Append(stream.Content);
+                Console.Write("\nAssistant> ");
+
+                await foreach (StreamingChatMessageContent stream in chatService.GetStreamingChatMessageContentsAsync(
+                    chatHistory, executionSettings: settings, kernel: kernel))
+                {
+                    Console.Write(stream.Content);
+                    reply.Append(stream.Content);
+                }
+            }
+            else
+            {
+                var aiReply = await chatService.GetChatMessageContentAsync(
+                    chatHistory,
+                    executionSettings: settings,
+                    kernel: kernel);
+
+                Console.WriteLine("Assistant> " + aiReply);
+
+                // Add the message from the agent to the chat history
+                chatHistory.AddMessage(aiReply.Role, aiReply.Content ?? string.Empty);
             }
 
             chatHistory.AddAssistantMessage(reply.ToString());
@@ -189,9 +211,7 @@ internal class KernelMemoryQdrantRagSK
 
         // Infinite chat loop
         Console.WriteLine("# Starting chat...");
-        var chatService = kernel.GetRequiredService<IChatCompletionService>();
-
-        await ChatLoop(chatService, systemPrompt, memory);
+        await ChatLoop(kernel, memory, systemPrompt, isStreaming: true);
     }
 
     public static async Task ClinicScenarioAsync()
@@ -207,15 +227,19 @@ internal class KernelMemoryQdrantRagSK
         var kernel = SemanticKernelChats.GetKernel(
             (b, c) =>
             {
+                //b.AddInMemoryVectorStore();
+
+                //b.Services.AddSingleton<QdrantClient>(sp => new QdrantClient("localhost"));
+                //b.AddQdrantVectorStore();
                 b.AddQdrantVectorStore("localhost");
             });
 
-        kernel.Plugins.AddFromType<ClinicPlugins>("clinic");
+        kernel.Plugins.AddFromType<ClinicPlugins>("Clinic");
 
         var config = new OllamaConfig
         {
             Endpoint = "http://localhost:11434",
-            TextModel = new OllamaModelConfig("phi3", maxToken: 131072),
+            TextModel = new OllamaModelConfig("llama2", maxToken: 131072),
             EmbeddingModel = new OllamaModelConfig("mxbai-embed-large", maxToken: 2048)
         };
 
@@ -246,24 +270,31 @@ internal class KernelMemoryQdrantRagSK
         await MemorizeTextAsync(memory, new[]
         {
             //("dayOfWeek", "Today is friday"),
-            ("timing1", "Clinic opens in morning from 10AM to 1PM, Mondaysm Tuesdays, Wednesdays, Thursdays, Fridays and Saturdays"),
+            ("timing1", "Clinic opens in morning from 10AM to 1PM, Mondays, Tuesdays, Wednesdays, Thursdays, Fridays and Saturdays"),
             ("timing2", "Clinic opens in evening from 6PM to 8PM, Mondays, Tuesdays and Wednesdays only, for the rest of the week clinic is off in evening"),
             ("timing3", "Clinic is off on Sunday")
         });
 
-        //OpenAIPromptExecutionSettings settings = new()
-        //{
-        //    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-        //};
+        OpenAIPromptExecutionSettings settings = new()
+        {
+            //ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions, // this cant be used together with FunctionChoiceBehavior
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+        };
 
         //var prompt = @"
         //    Question: {{$input}}
         //    Kernel Memory Answer: {{memory.ask}}
         //    Answer the question using the memory content: {{Recall}}";
+        //var systemPrompt = """
+        //    Question: {{$input}}
+        //    Tool call result: {{memory.ask $input}}
+        //    If the answer is empty say "I don't know", otherwise answer the question using the tool call result; be succinct and if needed call another tool / function
+        //    """;
         var systemPrompt = """
+            You are the clinic assistant who guides and answers the patients.
+
             Question: {{$input}}
-            Tool call result: {{memory.ask $input}}
-            If the answer is empty say "I don't know", otherwise answer the question using the tool call result; be succinct and if needed call another tool / function
+            Answer the question using the tool call results; be succinct and if you feel like it call another tool / function
             """;
 
         // https://github.com/microsoft/kernel-memory/blob/main/examples/003-dotnet-SemanticKernel-plugin/Program.cs
@@ -283,8 +314,6 @@ internal class KernelMemoryQdrantRagSK
 
         // Infinite chat loop
         Console.WriteLine("# Starting chat...");
-        var chatService = kernel.GetRequiredService<IChatCompletionService>();
-
-        await ChatLoop(chatService, systemPrompt, memory);
+        await ChatLoop(kernel, memory, systemPrompt, isStreaming: false, settings);
     }
 }

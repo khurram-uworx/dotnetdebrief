@@ -65,13 +65,13 @@ internal class KernelMemoryQdrantRag
 
         while (true)
         {
-            Console.Write("You >");
+            Console.Write("You> ");
             var question = Console.ReadLine();
 
             if (question == "break" || question == "exit" || question == null) break;
 
             var answer = await memory.AskAsync(question);
-            Console.Write("Copilot >");
+            Console.Write("Assistant> ");
             Console.WriteLine(answer.Result);
         }
     }

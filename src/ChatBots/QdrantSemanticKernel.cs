@@ -84,7 +84,8 @@ internal class QdrantSemanticKernel
 
         OpenAIPromptExecutionSettings settings = new()
         {
-            ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+            //ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions, // this cant be used together with FunctionChoiceBehavior
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
         };
 
         var prompt = @"

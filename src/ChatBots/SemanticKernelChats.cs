@@ -32,11 +32,11 @@ internal static class SemanticKernelChats
         // Create a chat completion service
         var builder = Kernel.CreateBuilder();
         builder.AddOpenAIChatCompletion(
-            modelId: "mistral", // llama2, phi3 dont support tools
+            modelId: "mistral", // llama2 and phi3 dont support tools
             openAIClient);
 
         // Add enterprise components
-        builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Trace));
+        builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Warning));
 
         if (null != action) action(builder, openAIClient);
 
@@ -120,7 +120,8 @@ Give me a TLDR with the fewest words.";
 
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {
-            ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+            //ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions, // this cant be used together with FunctionChoiceBehavior
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
         };
 
         // Create chat history
@@ -137,7 +138,7 @@ Give me a TLDR with the fewest words.";
         do
         {
             // Collect user input
-            Console.Write("User > ");
+            Console.Write("User> ");
             userInput = Console.ReadLine();
 
             // Add user input
@@ -150,7 +151,7 @@ Give me a TLDR with the fewest words.";
                 kernel: kernel);
 
             // Print the results
-            Console.WriteLine("Assistant > " + result);
+            Console.WriteLine("Assistant> " + result);
 
             // Add the message from the agent to the chat history
             history.AddMessage(result.Role, result.Content ?? string.Empty);
