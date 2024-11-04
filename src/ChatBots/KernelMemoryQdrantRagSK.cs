@@ -55,7 +55,7 @@ internal class KernelMemoryQdrantRagSK
             // Get user message (retry if the user enters an empty string)
             Console.Write("You> ");
             var userMessage = Console.ReadLine()?.Trim();
-            if (string.IsNullOrWhiteSpace(userMessage)) { continue; }
+            if (string.IsNullOrWhiteSpace(userMessage)) { break; }
             else { chatHistory.AddUserMessage(userMessage); }
 
             // Recall relevant information from memory
@@ -239,7 +239,7 @@ internal class KernelMemoryQdrantRagSK
         var config = new OllamaConfig
         {
             Endpoint = "http://localhost:11434",
-            TextModel = new OllamaModelConfig("llama2", maxToken: 131072),
+            TextModel = new OllamaModelConfig("mistral", maxToken: 131072), // granite-code:8b ?
             EmbeddingModel = new OllamaModelConfig("mxbai-embed-large", maxToken: 2048)
         };
 
