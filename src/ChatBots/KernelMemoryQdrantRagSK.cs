@@ -239,7 +239,7 @@ internal class KernelMemoryQdrantRagSK
         var config = new OllamaConfig
         {
             Endpoint = "http://localhost:11434",
-            TextModel = new OllamaModelConfig("mistral", maxToken: 131072), // granite-code:8b ?
+            TextModel = new OllamaModelConfig("calebfahlgren/natural-functions", maxToken: 131072), // mistral, calebfahlgren/natural-functions, granite-code:8b ?
             EmbeddingModel = new OllamaModelConfig("mxbai-embed-large", maxToken: 2048)
         };
 
