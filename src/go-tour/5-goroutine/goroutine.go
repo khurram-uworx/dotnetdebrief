@@ -8,7 +8,7 @@ import (
 func printMessage() {
 	fmt.Println("Hello from Goroutine!")
 	time.Sleep(time.Millisecond * 500)
-	fmt.Println("BYe from Goroutine!")
+	fmt.Println("Bye from Goroutine!")
 }
 
 func main() {

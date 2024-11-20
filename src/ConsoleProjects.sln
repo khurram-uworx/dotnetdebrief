@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ConsoleProjects\install.ps1 = ConsoleProjects\install.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rpa", "Rpa\Rpa.csproj", "{6A20513A-18CE-457A-84A7-3C5AD8715C9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{F128584B-46C1-49BF-8198-DE259117932F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F128584B-46C1-49BF-8198-DE259117932F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F128584B-46C1-49BF-8198-DE259117932F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A20513A-18CE-457A-84A7-3C5AD8715C9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A20513A-18CE-457A-84A7-3C5AD8715C9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A20513A-18CE-457A-84A7-3C5AD8715C9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A20513A-18CE-457A-84A7-3C5AD8715C9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
