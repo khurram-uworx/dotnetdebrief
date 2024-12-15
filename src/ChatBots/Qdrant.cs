@@ -1,8 +1,5 @@
-﻿#pragma warning disable SKEXP0020
-
-using Microsoft.Extensions.AI;
+﻿using Microsoft.Extensions.AI;
 using Microsoft.Extensions.VectorData;
-//using Microsoft.SemanticKernel.Connectors.InMemory;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
