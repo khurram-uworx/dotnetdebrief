@@ -40,7 +40,7 @@ internal static class AutoGenChats
             maxRound: 10);
     }
 
-    public static async Task HelloWorldPhi3Async()
+    public static async Task HelloOllamaWorldAsync(string textModel)
     {
         //https://microsoft.github.io/autogen-for-net/articles/AutoGen.Ollama/Chat-with-llama.html
         //
@@ -51,7 +51,7 @@ internal static class AutoGenChats
 
         var ollamaAgent = new OllamaAgent(
             httpClient: httpClient,
-            modelName: "phi3:latest",
+            modelName: textModel,
             name: "ollama",
             systemMessage: "You are a helpful AI assistant")
             .RegisterMessageConnector()
@@ -61,7 +61,7 @@ internal static class AutoGenChats
         Console.WriteLine($"{reply.From} {reply.GetContent()}");
     }
 
-    public static async Task HelloAgents()
+    public static async Task HelloAgents(string textModel)
     {
         //https://microsoft.github.io/autogen-for-net/articles/Two-agent-chat.html
 
@@ -75,7 +75,7 @@ internal static class AutoGenChats
         // teacher agent will create math questions
         var teacher = new OllamaAgent(
             httpClient: httpClient,
-            modelName: "mistral",
+            modelName: textModel,
             name: "teacher",
             systemMessage: @"You are a teacher that create pre-school math question for student and check answer.
 If the answer is correct, you stop the conversation by saying [COMPLETE].
@@ -118,7 +118,7 @@ If the answer is wrong, you ask student to fix it.")
         // student agent will answer the math questions
         var student = new OllamaAgent(
             httpClient: httpClient,
-            modelName: "mistral", //modelName: "phi3:latest",
+            modelName: textModel, //modelName: "phi3:latest",
             name: "student",
             systemMessage: "You are a student that answer question from teacher")
             .RegisterMessageConnector()

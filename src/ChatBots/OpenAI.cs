@@ -8,7 +8,7 @@ namespace ChatBots;
 
 internal static class OpenAI
 {
-    public static void Run()
+    public static void Run(string textModel)
     {
         var options = new OpenAIClientOptions
         {
@@ -17,7 +17,7 @@ internal static class OpenAI
         };
 
         var openAIClient = new OpenAIClient(new ApiKeyCredential("x"), options);
-        var chatClient = openAIClient.GetChatClient("phi3:mini");
+        var chatClient = openAIClient.GetChatClient(textModel);
         //var chatClient = openAIClient.GetChatClient("Phi-3-mini-128k-cpu-int4-rtn-block-32-onnx");
 
         var chatCompletion = chatClient.CompleteChat(

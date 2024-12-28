@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ChatBots\KernelMemoryQdrantRag.cs" Link="KernelMemoryQdrantRag.cs" />
+    <Compile Include="..\ChatBots\KernelMemoryQdrantRagSK.cs" Link="KernelMemoryQdrantRagSK.cs" />
+    <Compile Include="..\ChatBots\Plugins\ClinicPlugins.cs" Link="ClinicPlugins.cs" />
+    <Compile Include="..\ChatBots\SemanticKernelHelper.cs" Link="SemanticKernelHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.KernelMemory.AI.Ollama" Version="0.95.241216.2" />
+    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.95.241216.2" />
+    <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Qdrant" Version="0.95.241216.2" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.32.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.32.0-preview" />
+  </ItemGroup>
+
+</Project>

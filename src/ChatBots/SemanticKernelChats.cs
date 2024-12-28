@@ -3,49 +3,22 @@
 
 using ChatBots.Plugins;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Plugins.Memory;
-using OpenAI;
 using System;
-using System.ClientModel;
 using System.Threading.Tasks;
 
 namespace ChatBots;
 
 internal static class SemanticKernelChats
 {
-    public static Kernel GetKernel(Action<IKernelBuilder, OpenAIClient> action = null)
+    public static async Task HelloWorldAsync(string textModel)
     {
-        var options = new OpenAIClientOptions
-        {
-            Endpoint = new Uri("http://127.0.0.1:11434/v1"), // Ollama
-            // Endpoint = new Uri("http://127.0.0.1:5272/v1") // AI Toolkit
-            NetworkTimeout = TimeSpan.FromMinutes(5)
-        };
-        var openAIClient = new OpenAIClient(new ApiKeyCredential("x"), options);
-
-        // Create a chat completion service
-        var builder = Kernel.CreateBuilder();
-        builder.AddOpenAIChatCompletion(
-            modelId: "mistral", // llama2 and phi3 dont support tools
-            openAIClient);
-
-        // Add enterprise components
-        builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Warning));
-
-        if (null != action) action(builder, openAIClient);
-
-        return builder.Build();
-    }
-
-    public static async Task HelloWorldAsync()
-    {
-        var kernel = GetKernel();
+        var kernel = SemanticKernelHelper.GetKernel(textModel);
 
         // Example 1. Invoke the kernel with a prompt and display the result
         Console.WriteLine(await kernel.InvokePromptAsync("What color is the sky?"));
@@ -76,11 +49,11 @@ internal static class SemanticKernelChats
         Console.WriteLine(await kernel.InvokePromptAsync("Create a recipe for a {{$topic}} cake in JSON format", arguments));
     }
 
-    public static async Task PromptScenarioAsync()
+    public static async Task PromptScenarioAsync(string textModel)
     {
         // https://github.com/microsoft/semantic-kernel/blob/main/dotnet/README.md
 
-        var kernel = GetKernel();
+        var kernel = SemanticKernelHelper.GetKernel(textModel);
 
         string translationPrompt = @"{{$input}}
 Translate the text to math.";
@@ -107,11 +80,11 @@ Give me a TLDR with the fewest words.";
         Console.WriteLine(await kernel.InvokeAsync(translator, new() { ["input"] = summary.ToString() }));
     }
 
-    public static async Task LightsPluginAsync()
+    public static async Task LightsPluginAsync(string textModel)
     {
         //https://learn.microsoft.com/en-us/semantic-kernel/get-started/quick-start-guide
 
-        var kernel = GetKernel();
+        var kernel = SemanticKernelHelper.GetKernel(textModel);
 
         // Retrieve the chat completion service
         var chatCompletionService = kernel.Services.GetRequiredService<IChatCompletionService>();
@@ -158,12 +131,12 @@ Give me a TLDR with the fewest words.";
         } while (userInput is not null);
     }
 
-    public static async Task RagScenarioAsync()
+    public static async Task RagScenarioAsync(string textModel)
     {
         //https://elbruno.com/2024/06/17/full-rag-scenario-using-phi3-semantickernel-and-textmemory-in-local-mode/
         //https://techcommunity.microsoft.com/t5/educator-developer-blog/building-intelligent-applications-with-local-rag-in-net-and-phi/ba-p/4175721
 
-        var kernel = GetKernel((b, _) => b.AddLocalTextEmbeddingGeneration());
+        var kernel = SemanticKernelHelper.GetKernel(textModel, (b, _) => b.AddLocalTextEmbeddingGeneration());
 
         var question = "What is Bruno's favourite super hero?";
         Console.WriteLine($"This program will answer the following question: {question}");

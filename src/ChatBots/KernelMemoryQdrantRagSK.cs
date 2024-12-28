@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.AI.Ollama;
+using Microsoft.KernelMemory.DocumentStorage.DevTools;
+using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -131,10 +133,10 @@ internal class KernelMemoryQdrantRagSK
         }
     }
 
-    public static async Task RagDocumentsScenarioAsync()
+    public static async Task RagDocumentsScenarioAsync(string textModel, string embeddingModelName)
     {
         //https://github.com/microsoft/kernel-memory/blob/main/examples/302-dotnet-sk-km-chat/Program.cs
-        var kernel = SemanticKernelChats.GetKernel(
+        var kernel = SemanticKernelHelper.GetKernel(textModel,
             (b, c) =>
             {
                 b.AddQdrantVectorStore("localhost");
@@ -143,8 +145,8 @@ internal class KernelMemoryQdrantRagSK
         var config = new OllamaConfig
         {
             Endpoint = "http://localhost:11434",
-            TextModel = new OllamaModelConfig("phi3", maxToken: 131072),
-            EmbeddingModel = new OllamaModelConfig("mxbai-embed-large", maxToken: 2048) // nomic-embed-text
+            TextModel = new OllamaModelConfig(textModel, maxToken: 131072),
+            EmbeddingModel = new OllamaModelConfig(embeddingModelName, maxToken: 2048) // nomic-embed-text
         };
 
         IKernelMemory memory = new KernelMemoryBuilder()
@@ -155,6 +157,7 @@ internal class KernelMemoryQdrantRagSK
                 l.SetMinimumLevel(LogLevel.Debug);
                 l.AddSimpleConsole(c => c.SingleLine = true);
             }))
+            .WithSimpleFileStorage(new SimpleFileStorageConfig { StorageType = FileSystemTypes.Disk }) // local file storage
             .WithQdrantMemoryDb(endpoint: "http://localhost:6333", apiKey: "x")
             .Build<MemoryServerless>();
 
@@ -211,7 +214,7 @@ internal class KernelMemoryQdrantRagSK
         await ChatLoop(kernel, memory, systemPrompt, isStreaming: true);
     }
 
-    public static async Task ClinicScenarioAsync()
+    public static async Task ClinicScenarioAsync(string textModel, string embeddingModelName)
     {
         // https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/Demos/VectorStoreRAG/README.md
         // https://github.com/microsoft/kernel-memory/blob/main/extensions/Qdrant/Qdrant.TestApplication/Program.cs
@@ -221,7 +224,7 @@ internal class KernelMemoryQdrantRagSK
         //https://github.com/microsoft/semantic-kernel/blob/21f8a278e55c23b34e96c9de3ab06e8564dca703/docs/decisions/00NN-text-search.md
         //https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/Demos/VectorStoreRAG/README.md
 
-        var kernel = SemanticKernelChats.GetKernel(
+        var kernel = SemanticKernelHelper.GetKernel(textModel,
             (b, c) =>
             {
                 //b.AddInMemoryVectorStore();
@@ -236,8 +239,8 @@ internal class KernelMemoryQdrantRagSK
         var config = new OllamaConfig
         {
             Endpoint = "http://localhost:11434",
-            TextModel = new OllamaModelConfig("calebfahlgren/natural-functions", maxToken: 131072), // mistral, calebfahlgren/natural-functions, granite-code:8b ?
-            EmbeddingModel = new OllamaModelConfig("mxbai-embed-large", maxToken: 2048)
+            TextModel = new OllamaModelConfig(textModel, maxToken: 131072), // mistral, calebfahlgren/natural-functions, granite-code:8b ?
+            EmbeddingModel = new OllamaModelConfig(embeddingModelName, maxToken: 2048)
         };
 
         //var embeddingGenerator = kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();

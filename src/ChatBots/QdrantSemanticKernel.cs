@@ -1,28 +1,71 @@
 ﻿#pragma warning disable SKEXP0001
+#pragma warning disable SKEXP0010
 #pragma warning disable SKEXP0020
 #pragma warning disable SKEXP0050
 
+using ChatBots.Models;
 using ChatBots.Plugins;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.AI.Embeddings;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
+using Microsoft.SemanticKernel.Data;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Plugins.Memory;
+using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
+using Microsoft.SemanticKernel.Services;
 using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChatBots;
 
 internal class QdrantSemanticKernel
 {
-    public static async Task RagClinicScenarioAsync(string memoryCollectionName)
+    class OllamaTextEmbeddingService : ITextEmbeddingGenerationService
     {
+        private readonly OllamaEmbeddingGenerator _embeddingGenerator;
+
+        public OllamaTextEmbeddingService(OllamaEmbeddingGenerator embeddingGenerator)
+        {
+            _embeddingGenerator = embeddingGenerator;
+        }
+
+        IReadOnlyDictionary<string, object?> IAIService.Attributes => throw new NotImplementedException();
+
+        //public async Task<IList<float>> GenerateEmbeddingAsync(string text, CancellationToken cancellationToken = default)
+        //{
+        //    return await _embeddingGenerator.GenerateEmbeddingAsync(text, cancellationToken);
+        //}
+
+        async Task<IList<ReadOnlyMemory<float>>> IEmbeddingGenerationService<string, float>.GenerateEmbeddingsAsync(IList<string> data, Kernel? kernel, CancellationToken cancellationToken)
+        {
+            var embeddings = new List<ReadOnlyMemory<float>>();
+
+            foreach (var d in data)
+            {
+                var embedding = await _embeddingGenerator.GenerateEmbeddingAsync(d, cancellationToken: cancellationToken);
+
+                // Convert the embedding to ReadOnlyMemory<float> and add to the list
+                embeddings.Add(embedding.Vector.ToArray());
+            }
+
+            return embeddings;
+        }
+    }
+
+    public static async Task RagClinicScenarioAsync(string textModel, string memoryCollectionName)
+    {
+        // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/qdrant-connector
         // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/code-samples
         // https://github.com/kinfey/SemanticKernelCookBook/blob/main/notebooks/dotNET/05/EmbeddingsWithSK.ipynb
 
-        var kernel = SemanticKernelChats.GetKernel(
+        var kernel = SemanticKernelHelper.GetKernel(textModel,
             (b, c) =>
             {
                 b.AddLocalTextEmbeddingGeneration();
@@ -103,5 +146,77 @@ internal class QdrantSemanticKernel
         var question = "Will clinic open later in the day today?";
         var resultFunction = await kernel.InvokePromptAsync(prompt, getArguments(question));
         Console.WriteLine(resultFunction);
+    }
+
+    //https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/GettingStartedWithTextSearch/Step4_Search_With_VectorStore.cs
+    public static async Task SearchScenarioAsync(string textModel, string embeddingModelName, string collectionName)
+    {
+        var kernel = SemanticKernelHelper.GetKernel(textModel,
+            (b, c) =>
+            {
+                //b.AddOpenAITextEmbeddingGeneration(modelId: embeddingModelName, openAIClient: c);
+                // facing https://github.com/microsoft/semantic-kernel/issues/8833
+                //b.AddLocalTextEmbeddingGeneration();
+
+                b.AddQdrantVectorStore("localhost"); // this is more generalized that register IVectorStore
+                // we can also use AddQdrantVectorStoreRecordCollection that will register IVectorStoreRecordCollection and IVectorizedSearch
+                // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/vector-search
+                // IVectorStoreRecordCollection inherits from IVectorizedSearch
+            });
+
+        // https://learn.microsoft.com/en-us/semantic-kernel/concepts/text-search/out-of-the-box-textsearch/vectorstore-textsearch
+        //var textEmbeddingGenerator = kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();
+        IEmbeddingGenerator<string, Embedding<float>> textEmbeddingGenerator = new OllamaEmbeddingGenerator(
+            new Uri("http://localhost:11434/"), embeddingModelName);
+        var vectorStore = kernel.Services.GetRequiredService<IVectorStore>();
+
+        IVectorStoreRecordCollection<ulong, Movie> collection = vectorStore.GetCollection<ulong, Movie>(collectionName); // keys can only be ulong or Guid (for Qdrant?)
+        var embeddings = await textEmbeddingGenerator.GenerateEmbeddingAsync("A family friendly movie");
+        ReadOnlyMemory<float> searchVector = embeddings.Vector; //embeddings.Data;
+        
+        // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/vector-search?pivots=programming-language-csharp
+        // Do the search, passing an options object with a Top value to limit resulst to the single top match.
+        var searchResult = await collection.VectorizedSearchAsync(searchVector, new() { Top = 1 });
+
+        // Inspect the returned hotel.
+        await foreach (var record in searchResult.Results)
+        {
+            Console.WriteLine("Found record score: " + record.Score);
+            Console.WriteLine("Found record key: " + record.Record.Key);
+            Console.WriteLine("Found record title: " + record.Record.Title);
+            Console.WriteLine("Found record description: " + record.Record.Description);
+        }
+
+        if (collection is IVectorizedSearch<Movie> vectorizedSearch)
+        {
+            var textSearch = new VectorStoreTextSearch<Movie>(vectorizedSearch, new OllamaTextEmbeddingService(
+                textEmbeddingGenerator as OllamaEmbeddingGenerator));
+            var searchPlugin = textSearch.CreateWithGetTextSearchResults("SearchPlugin");
+            kernel.Plugins.Add(searchPlugin);
+
+            var query = "On the weekend; family is getting together and we are thinking to watch a movie, can you recommend something?";
+            string promptTemplate = """
+                {{#with (SearchPlugin-GetTextSearchResults query)}}  
+                  {{#each this}}  
+                    Name: {{Name}}
+                    Value: {{Value}}
+                    Link: {{Link}}
+                    -----------------
+                  {{/each}}  
+                {{/with}}  
+
+                {{query}}
+
+                Include citations to the relevant information where it is referenced in the response.
+                """;
+            KernelArguments arguments = new() { { "query", query } };
+            HandlebarsPromptTemplateFactory promptTemplateFactory = new();
+            Console.WriteLine(await kernel.InvokePromptAsync(
+                promptTemplate,
+                arguments,
+                templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat,
+                promptTemplateFactory: promptTemplateFactory
+            ));
+        }
     }
 }

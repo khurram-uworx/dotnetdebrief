@@ -1,18 +1,19 @@
 ﻿using Microsoft.ML.OnnxRuntimeGenAI;
 using System;
+using System.IO;
 
 namespace ChatBots;
 
 internal static class ML
 {
-    public static void MLTest()
+    public static void MLTest(string textModel)
     {
         //string modelPath = @"C:\Users\khurram\.aitk\models\microsoft\Phi-3-mini-128k-instruct-onnx\directml\directml-int4-awq-block-128";
         //string modelPath = @"C:\Users\khurram\.aitk\models\microsoft\Phi-3-mini-4k-instruct-onnx\cpu_and_mobile\cpu-int4-rtn-block-32-acc-level-4";
-        string modelPath = @"Models\directml\directml-int4-awq-block-128";
+        string modelPath = Path.Combine("Models", "directml", textModel);
         Console.Write("Loading model from " + modelPath + "...");
         using Model model = new(modelPath);
-        Console.Write("Done\n");
+        Console.WriteLine("Done");
 
         using Tokenizer tokenizer = new(model);
         using TokenizerStream tokenizerStream = tokenizer.CreateStream();

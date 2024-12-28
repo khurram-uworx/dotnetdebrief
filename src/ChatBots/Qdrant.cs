@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.AI;
+﻿using ChatBots.Models;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
+using Models;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
 using System;
@@ -11,36 +13,22 @@ namespace ChatBots;
 
 //https://devblogs.microsoft.com/dotnet/introducing-microsoft-extensions-ai-preview/
 
-class Movie
-{
-    [VectorStoreRecordKey]
-    public int Key { get; set; }
-
-    [VectorStoreRecordData]
-    public string Title { get; set; }
-
-    [VectorStoreRecordData]
-    public string Description { get; set; }
-
-    [VectorStoreRecordVector(384, DistanceFunction.CosineSimilarity)]
-    public ReadOnlyMemory<float> Vector { get; set; }
-}
 
 internal class Qdrant
 {
-    public static async Task QuickStartAsync()
+    public static async Task QuickStartAsync(string collectionName)
     {
         // https://qdrant.tech/documentation/quickstart
 
         var client = new QdrantClient("localhost", 6334); // gprc port; the other one is 6333
-        var vectorStore = new QdrantVectorStore(client,
-            options: new() { HasNamedVectors = true });
+        //var vectorStore = new QdrantVectorStore(client,
+        //    options: new() { HasNamedVectors = true });
 
-        if (!await client.CollectionExistsAsync("test_collection"))
-            await client.CreateCollectionAsync("test_collection",
+        if (!await client.CollectionExistsAsync(collectionName))
+            await client.CreateCollectionAsync(collectionName,
                 vectorsConfig: new VectorParams() { Size = 4, Distance = Distance.Dot });
 
-        var operationInfo = await client.UpsertAsync(collectionName: "test_collection",
+        var operationInfo = await client.UpsertAsync(collectionName,
             points: new List<PointStruct>
             {
                 new()
@@ -63,14 +51,14 @@ internal class Qdrant
                 }
             });
 
-        var searchResult1 = await client.QueryAsync("test_collection",
+        var searchResult1 = await client.QueryAsync(collectionName,
             query: new float[] { 0.2f, 0.1f, 0.9f, 0.7f },
             limit: 3);
         Console.WriteLine("# We should get Berlin, Moscow and then London");
         Console.WriteLine(searchResult1);
         Console.WriteLine(Environment.NewLine + " ========== " + Environment.NewLine);
 
-        var searchResult2 = await client.QueryAsync("test_collection",
+        var searchResult2 = await client.QueryAsync(collectionName,
             query: new float[] { 0.2f, 0.1f, 0.9f, 0.7f },
             filter: Conditions.MatchKeyword("city", "London"),
             limit: 3, payloadSelector: true);
@@ -80,38 +68,10 @@ internal class Qdrant
         Console.WriteLine(Environment.NewLine + " ========== " + Environment.NewLine);
     }
 
-    public static async Task VectorDataExtensionsAsync()
+    public static async Task VectorDataExtensionsAsync(string embeddingModelName, string collectionName)
     {
         //https://devblogs.microsoft.com/dotnet/introducing-microsoft-extensions-vector-data
         //https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/qdrant-connector
-
-        var movieData = new List<Movie>()
-        {
-            new Movie
-            {
-                Key = 0,
-                Title = "Lion King",
-                Description = "The Lion King is a classic Disney animated film that tells the story of a young lion named Simba who embarks on a journey to reclaim his throne as the king of the Pride Lands after the tragic death of his father."
-            },
-            new Movie
-            {
-                Key = 1,
-                Title = "Inception",
-                Description = "Inception is a science fiction film directed by Christopher Nolan that follows a group of thieves who enter the dreams of their targets to steal information."
-            },
-            new Movie
-            {
-                Key = 2,
-                Title = "The Matrix",
-                Description = "The Matrix is a science fiction film directed by the Wachowskis that follows a computer hacker named Neo who discovers that the world he lives in is a simulated reality created by machines."
-            },
-            new Movie
-            {
-                Key = 3,
-                Title = "Shrek",
-                Description = "Shrek is an animated film that tells the story of an ogre named Shrek who embarks on a quest to rescue Princess Fiona from a dragon and bring her back to the kingdom of Duloc."
-            }
-        };
 
         //var vectorStore = new InMemoryVectorStore();
         var vectorStore = new QdrantVectorStore(new QdrantClient("localhost"));
@@ -121,13 +81,13 @@ internal class Qdrant
         //    collectionName: "movies",
         //    options: new() { HasNamedVectors = true });
 
-        var movies = vectorStore.GetCollection<int, Movie>("movies");
+        var movies = vectorStore.GetCollection<ulong, Movie>(collectionName); // keys can only be ulong or Guid (for Qdrant?)
         await movies.CreateCollectionIfNotExistsAsync();
 
         IEmbeddingGenerator<string, Embedding<float>> generator = new OllamaEmbeddingGenerator(
-            new Uri("http://localhost:11434/"), "all-minilm");
+            new Uri("http://localhost:11434/"), embeddingModelName);
 
-        foreach (var movie in movieData)
+        foreach (var movie in TestData.GetMovies())
         {
             movie.Vector = await generator.GenerateEmbeddingVectorAsync(movie.Description);
             //await collection.UpsertAsync(new Hotel
