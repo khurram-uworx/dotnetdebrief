@@ -1,14 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Qdrant.Client;
+using Qdrant.Client.Grpc;
 using VectorDatabases.Data;
 
 namespace VectorDatabases;
 
 internal class QdrantMovieRecommender
 {
+    //https://qdrant.tech/documentation/advanced-tutorials/collaborative-filtering/
+    //https://github.com/qdrant/examples/blob/master/collaborative-filtering/collaborative-filtering.ipynb
+
     readonly MovieContext dbContext;
 
     //https://qdrant.tech/documentation/examples/recommendation-system-ovhcloud/
-    readonly Dictionary<int, (List<float> values, List<int> indices)> userSparseVectors = new();
+    readonly Dictionary<int, List<(int, float)>> sparseVectors = new();
 
     public QdrantMovieRecommender()
     {
@@ -23,7 +28,7 @@ internal class QdrantMovieRecommender
 
     void loadData(string usersPath, string moviesPath, string ratingsPath)
     {
-        // Load users
+        Console.WriteLine("Loading users...");
         using var usersReader = new StreamReader(usersPath);
         while (!usersReader.EndOfStream)
         {
@@ -41,7 +46,7 @@ internal class QdrantMovieRecommender
             });
         }
 
-        // Load movies
+        Console.WriteLine("Loading movies...");
         using var moviesReader = new StreamReader(moviesPath);
         while (!moviesReader.EndOfStream)
         {
@@ -59,7 +64,7 @@ internal class QdrantMovieRecommender
 
         dbContext.SaveChanges();
 
-        // Load ratings
+        Console.WriteLine("Loading ratings...");
         var ratings = new List<Rating>();
         using var ratingsReader = new StreamReader(ratingsPath);
         while (!ratingsReader.EndOfStream)
@@ -77,24 +82,72 @@ internal class QdrantMovieRecommender
             });
         }
 
-        // Normalize ratings
+        Console.WriteLine("Normalizing ratings...");
         var mean = ratings.Average(r => r.RatingValue);
         var std = (float)Math.Sqrt(ratings.Average(r => Math.Pow(r.RatingValue - mean, 2)));
+
         foreach (var rating in ratings)
             rating.RatingValue = (rating.RatingValue - mean) / std;
 
         dbContext.Ratings.AddRange(ratings);
         dbContext.SaveChanges();
 
-        // Create sparse vectors
-        foreach (var rating in ratings)
-        {
-            if (!userSparseVectors.ContainsKey(rating.UserId))
-                userSparseVectors[rating.UserId] = (new List<float>(), new List<int>());
+        Console.WriteLine("Aggregating...");
+        //var mergedData = dbContext.Ratings
+        //    .Include(r => r.Movie)
+        //    .Select(r => new
+        //    {
+        //        r.RatingId, r.UserId, r.MovieId,
+        //        r.RatingValue, r.Timestamp,
+        //        MovieTitle = r.Movie.Title
+        //    })
+        //    .ToList();
 
-            userSparseVectors[rating.UserId].values.Add(rating.RatingValue);
-            userSparseVectors[rating.UserId].indices.Add(rating.MovieId);
+        var ratingsAggregated = dbContext.Ratings
+            .GroupBy(r => new { r.UserId, r.MovieId })
+            .Select(g => new
+            {
+                g.Key.UserId, g.Key.MovieId,
+                AverageRating = g.Average(r => r.RatingValue)
+            })
+            .ToList();
+
+        Console.WriteLine("Creating sparse vectors...");
+        foreach (var rating in ratingsAggregated)
+        {
+            if (!sparseVectors.ContainsKey(rating.UserId))
+                sparseVectors[rating.UserId] = new();
+
+            sparseVectors[rating.UserId].Add(new (rating.MovieId, rating.AverageRating));
         }
+    }
+
+    async Task uploadPointsAsync(QdrantClient client, string collectionName)
+    {
+        Console.WriteLine("Uploading points....");
+        IEnumerable<(float, uint)> getValues(int id)
+        {
+            foreach (var item in sparseVectors[id])
+                yield return new(item.Item2, (uint)item.Item1);
+        }
+
+        var users = await dbContext.Users.ToListAsync();
+        var points = users.Select(user => new PointStruct
+        {
+            Id = (uint)user.UserId,
+            Vectors = ("ratings", new Vector(           //float[], (float[], uint[]), (float, uint)[] or float[][]
+                getValues(user.UserId).ToArray())),
+            Payload =
+            {
+                ["user_id"] = user.UserId,
+                ["gender"] = user.Gender,
+                ["age"] = user.Age,
+                ["occupation"] = user.Occupation,
+                ["zip"] = user.Zip
+            }
+        });
+
+        await client.UpsertAsync(collectionName, points: points.ToArray());
     }
 
     public async Task<List<Movie>> SearchMoviesByTitle(string titlePattern)
@@ -102,5 +155,82 @@ internal class QdrantMovieRecommender
         return await dbContext.Movies
             .Where(m => m.Title.Contains(titlePattern))
             .ToListAsync();
+    }
+
+    public async Task CreateCollection(string collectionName)
+    {
+        var client = new QdrantClient("localhost", 6334); // https: false);
+
+        //https://qdrant.tech/articles/sparse-vectors/
+        //var sparseVectorConfig = new SparseVectorConfig();
+        //sparseVectorConfig.Map["ratings"] = new SparseVectorParams();
+
+        var vectorDimension = this.dbContext.Movies.LongCount();
+        
+        await client.RecreateCollectionAsync(collectionName,
+            vectorsConfig: new VectorParams() { Distance = Distance.Cosine, Size = (ulong)vectorDimension },
+            sparseVectorsConfig: new SparseVectorConfig(("ratings", new SparseVectorParams
+            {
+                Index = new SparseIndexConfig
+                {
+                    OnDisk = false, FullScanThreshold = 10000
+                }
+            })));
+        await this.uploadPointsAsync(client, collectionName);
+    }
+
+    public async Task<IDictionary<string, float>> GetRecommendations(string collectionName, IDictionary<uint, float> givenRatings)
+    {
+        var client = new QdrantClient("localhost");
+
+        var searchResults = await client.SearchAsync(collectionName,
+            vector: givenRatings.Values.ToArray(), sparseIndices: givenRatings.Keys.Select(k => (uint)k).ToArray(),
+            vectorsSelector: new WithVectorsSelector { Include = new VectorsSelector { Names = { "ratings" } } },
+            vectorName: "ratings", limit: 20);
+
+        var movieScores = new Dictionary<uint, float>();
+        foreach (var searchPoint in searchResults)
+        {
+            if (null != searchPoint && null != searchPoint.Vectors)
+            {
+                var ratings = searchPoint.Vectors.Vectors_.Vectors.GetValueOrDefault("ratings");
+                if (null != ratings)
+                {
+                    int i = 0;
+                    foreach (var index in ratings.Indices.Data)
+                    {
+                        if (!givenRatings.ContainsKey(index)) // we dont want already watched/ranked movies from givenRatings
+                        {
+                            if (!movieScores.ContainsKey(index)) movieScores.Add(index, 0);
+                            movieScores[index] += ratings.Data[i];
+                        }
+
+                        i++;
+                    }
+                }
+            }
+        }
+
+        //var preferredGenres = dbContext.Movies.Where(m => givenRatings.Keys.Contains((uint)m.MovieId))
+        //    .ToArray() // the split below will not be translated to In memory "SQL"
+        //    .SelectMany(m => m.Genres.Split("|".ToCharArray()))
+        //    .Distinct();
+
+        var movies = new Dictionary<string, float>();
+        foreach(var key in movieScores.Keys)
+        {
+            var movie = dbContext.Movies.FirstOrDefault(m => m.MovieId == key);
+            if (null != movie)
+            {
+                // lets keep ourselves restricted to watched genres
+                //if (movie.Genres.Split("|".ToCharArray()).Any(g => preferredGenres.Contains(g)))
+                {
+                    if (!movies.ContainsKey(movie.Title)) movies.Add(movie.Title, 0);
+                    movies[movie.Title] += movieScores[key];
+                }
+            }
+        }
+
+        return movies;
     }
 }
