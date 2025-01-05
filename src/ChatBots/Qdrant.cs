@@ -13,14 +13,29 @@ namespace ChatBots;
 
 //https://devblogs.microsoft.com/dotnet/introducing-microsoft-extensions-ai-preview/
 
-
 internal class Qdrant
 {
-    public static async Task QuickStartAsync(string collectionName)
+    internal static async Task<IVectorStoreRecordCollection<ulong, Movie>> CreateMovieCollectionAsync(
+        IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
+        IVectorStore vectorStore, string collectionName)
+    {
+        var movies = vectorStore.GetCollection<ulong, Movie>(collectionName); // keys can only be ulong or Guid (for Qdrant?)
+        await movies.CreateCollectionIfNotExistsAsync();
+
+        foreach (var movie in TestData.GetMovies())
+        {
+            movie.Vector = await embeddingGenerator.GenerateEmbeddingVectorAsync(movie.Description);
+            await movies.UpsertAsync(movie);
+        }
+
+        return movies;
+    }
+
+    public static async Task QuickStartAsync(string hostQdrant, string collectionName)
     {
         // https://qdrant.tech/documentation/quickstart
 
-        var client = new QdrantClient("localhost", 6334); // gprc port; the other one is 6333
+        var client = new QdrantClient(hostQdrant, 6334); // gprc port; the other one is 6333
         //var vectorStore = new QdrantVectorStore(client,
         //    options: new() { HasNamedVectors = true });
 
@@ -54,6 +69,7 @@ internal class Qdrant
         var searchResult1 = await client.QueryAsync(collectionName,
             query: new float[] { 0.2f, 0.1f, 0.9f, 0.7f },
             limit: 3);
+
         Console.WriteLine("# We should get Berlin, Moscow and then London");
         Console.WriteLine(searchResult1);
         Console.WriteLine(Environment.NewLine + " ========== " + Environment.NewLine);
@@ -68,41 +84,23 @@ internal class Qdrant
         Console.WriteLine(Environment.NewLine + " ========== " + Environment.NewLine);
     }
 
-    public static async Task VectorDataExtensionsAsync(string embeddingModelName, string collectionName)
+    public static async Task VectorDataExtensionsAsync(string urlOllama, string embeddingModelName, string hostQdrant, string collectionName)
     {
         //https://devblogs.microsoft.com/dotnet/introducing-microsoft-extensions-vector-data
         //https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/qdrant-connector
 
         //var vectorStore = new InMemoryVectorStore();
-        var vectorStore = new QdrantVectorStore(new QdrantClient("localhost"));
-
+        IVectorStore vectorStore = new QdrantVectorStore(new QdrantClient(hostQdrant));
         //var collection = new QdrantVectorStoreRecordCollection<Movie>(
-        //    new QdrantClient("localhost"),
+        //    new QdrantClient(hostQdrant),
         //    collectionName: "movies",
         //    options: new() { HasNamedVectors = true });
-
-        var movies = vectorStore.GetCollection<ulong, Movie>(collectionName); // keys can only be ulong or Guid (for Qdrant?)
-        await movies.CreateCollectionIfNotExistsAsync();
-
-        IEmbeddingGenerator<string, Embedding<float>> generator = new OllamaEmbeddingGenerator(
-            new Uri("http://localhost:11434/"), embeddingModelName);
-
-        foreach (var movie in TestData.GetMovies())
-        {
-            movie.Vector = await generator.GenerateEmbeddingVectorAsync(movie.Description);
-            //await collection.UpsertAsync(new Hotel
-            //{
-            //    HotelId = 1,
-            //    HotelName = "Hotel Happy",
-            //    Description = "A place where everyone can be happy.",
-            //    DescriptionEmbedding = new float[4] { 0.9f, 0.1f, 0.1f, 0.1f }
-            //});
-
-            await movies.UpsertAsync(movie);
-        }
+        IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator = new OllamaEmbeddingGenerator(
+            new Uri(urlOllama), embeddingModelName);
+        var movies = await CreateMovieCollectionAsync(embeddingGenerator, vectorStore, collectionName);
 
         var query = "A family friendly movie";
-        var queryEmbedding = await generator.GenerateEmbeddingVectorAsync(query);
+        var queryEmbedding = await embeddingGenerator.GenerateEmbeddingVectorAsync(query);
 
         var searchOptions = new VectorSearchOptions()
         {

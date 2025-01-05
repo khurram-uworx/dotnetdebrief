@@ -11,7 +11,7 @@ internal static class OpenAITools
 {
     //https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/openai/Azure.AI.OpenAI/tests/Samples/01_Chat.cs
 
-    public static void ChatWithTools(string textModel)
+    public static void ChatWithTools(string urlOllama, string textModel)
     {
         static string GetCurrentWeather(string location, string unit = "celsius")
         {
@@ -43,7 +43,7 @@ internal static class OpenAITools
 
         var clientOptions = new OpenAIClientOptions
         {
-            Endpoint = new Uri("http://127.0.0.1:11434/v1") // Ollama
+            Endpoint = new Uri($"{urlOllama}/v1") // Ollama
         };
 
         var openAIClient = new OpenAIClient(new ApiKeyCredential("x"), clientOptions);

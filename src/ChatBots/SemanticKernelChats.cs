@@ -16,9 +16,9 @@ namespace ChatBots;
 
 internal static class SemanticKernelChats
 {
-    public static async Task HelloWorldAsync(string textModel)
+    public static async Task HelloWorldAsync(string urlOllama, string textModel)
     {
-        var kernel = SemanticKernelHelper.GetKernel(textModel);
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
 
         // Example 1. Invoke the kernel with a prompt and display the result
         Console.WriteLine(await kernel.InvokePromptAsync("What color is the sky?"));
@@ -49,11 +49,11 @@ internal static class SemanticKernelChats
         Console.WriteLine(await kernel.InvokePromptAsync("Create a recipe for a {{$topic}} cake in JSON format", arguments));
     }
 
-    public static async Task PromptScenarioAsync(string textModel)
+    public static async Task PromptScenarioAsync(string urlOllama, string textModel)
     {
         // https://github.com/microsoft/semantic-kernel/blob/main/dotnet/README.md
 
-        var kernel = SemanticKernelHelper.GetKernel(textModel);
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
 
         string translationPrompt = @"{{$input}}
 Translate the text to math.";
@@ -80,11 +80,11 @@ Give me a TLDR with the fewest words.";
         Console.WriteLine(await kernel.InvokeAsync(translator, new() { ["input"] = summary.ToString() }));
     }
 
-    public static async Task LightsPluginAsync(string textModel)
+    public static async Task LightsPluginAsync(string urlOllama, string textModel)
     {
         //https://learn.microsoft.com/en-us/semantic-kernel/get-started/quick-start-guide
 
-        var kernel = SemanticKernelHelper.GetKernel(textModel);
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
 
         // Retrieve the chat completion service
         var chatCompletionService = kernel.Services.GetRequiredService<IChatCompletionService>();
@@ -131,12 +131,12 @@ Give me a TLDR with the fewest words.";
         } while (userInput is not null);
     }
 
-    public static async Task RagScenarioAsync(string textModel)
+    public static async Task RagScenarioAsync(string urlOllama, string textModel)
     {
         //https://elbruno.com/2024/06/17/full-rag-scenario-using-phi3-semantickernel-and-textmemory-in-local-mode/
         //https://techcommunity.microsoft.com/t5/educator-developer-blog/building-intelligent-applications-with-local-rag-in-net-and-phi/ba-p/4175721
 
-        var kernel = SemanticKernelHelper.GetKernel(textModel, (b, _) => b.AddLocalTextEmbeddingGeneration());
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel, (b, _) => b.AddLocalTextEmbeddingGeneration());
 
         var question = "What is Bruno's favourite super hero?";
         Console.WriteLine($"This program will answer the following question: {question}");

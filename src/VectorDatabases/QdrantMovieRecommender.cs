@@ -157,9 +157,9 @@ internal class QdrantMovieRecommender
             .ToListAsync();
     }
 
-    public async Task CreateCollection(string collectionName)
+    public async Task CreateCollection(string hostQdrant, string collectionName)
     {
-        var client = new QdrantClient("localhost", 6334); // https: false);
+        var client = new QdrantClient(hostQdrant, 6334); // https: false);
 
         //https://qdrant.tech/articles/sparse-vectors/
         //var sparseVectorConfig = new SparseVectorConfig();
@@ -179,9 +179,9 @@ internal class QdrantMovieRecommender
         await this.uploadPointsAsync(client, collectionName);
     }
 
-    public async Task<IDictionary<string, float>> GetRecommendations(string collectionName, IDictionary<uint, float> givenRatings)
+    public async Task<IDictionary<string, float>> GetRecommendations(string hostQdrant, string collectionName, IDictionary<uint, float> givenRatings)
     {
-        var client = new QdrantClient("localhost");
+        var client = new QdrantClient(hostQdrant);
 
         var searchResults = await client.SearchAsync(collectionName,
             vector: givenRatings.Values.ToArray(), sparseIndices: givenRatings.Keys.Select(k => (uint)k).ToArray(),

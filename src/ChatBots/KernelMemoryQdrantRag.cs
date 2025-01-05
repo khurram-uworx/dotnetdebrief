@@ -14,7 +14,7 @@ namespace ChatBots;
 
 internal class KernelMemoryQdrantRag
 {
-    public static async Task RagWikipediaScenarioAsync(string textModel, string embeddingModelName)
+    public static async Task RagWikipediaScenarioAsync(string urlOllama, string textModel, string embeddingModelName, string urlQdrant)
     {
         // https://github.com/microsoft/kernel-memory/tree/main/examples/002-dotnet-Serverless  
         // https://github.com/microsoft/kernel-memory/blob/main/examples/212-dotnet-ollama/Program.cs
@@ -24,9 +24,10 @@ internal class KernelMemoryQdrantRag
          * even the Hugging Face Models through it: https://github.com/microsoft/kernel-memory/discussions/753
          */
 
+        //https://github.com/microsoft/kernel-memory/blob/main/examples/212-dotnet-ollama/Program.cs
         var config = new OllamaConfig
         {
-            Endpoint = "http://localhost:11434",
+            Endpoint = urlOllama,
             TextModel = new OllamaModelConfig(textModel, maxToken: 131072),
             EmbeddingModel = new OllamaModelConfig(embeddingModelName, maxToken: 2048) // nomic-embed-text
         };
@@ -40,7 +41,7 @@ internal class KernelMemoryQdrantRag
                 l.AddSimpleConsole(c => c.SingleLine = true);
             }))
             .WithSimpleFileStorage(new SimpleFileStorageConfig { StorageType = FileSystemTypes.Disk }) // local file storage
-            .WithQdrantMemoryDb(endpoint: "http://localhost:6333", apiKey: "x")
+            .WithQdrantMemoryDb(endpoint: urlQdrant, apiKey: "x")
             .Build<MemoryServerless>();
 
         Console.WriteLine("# Generating kernel memory...");

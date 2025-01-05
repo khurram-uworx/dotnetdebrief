@@ -1,5 +1,4 @@
 ﻿#pragma warning disable SKEXP0001
-#pragma warning disable SKEXP0010
 #pragma warning disable SKEXP0020
 #pragma warning disable SKEXP0050
 
@@ -59,13 +58,13 @@ internal class QdrantSemanticKernel
         }
     }
 
-    public static async Task RagClinicScenarioAsync(string textModel, string memoryCollectionName)
+    public static async Task RagClinicScenarioAsync(string urlOllama, string textModel, string urlQdrant, string hostQdrant, string memoryCollectionName)
     {
         // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/qdrant-connector
         // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/code-samples
         // https://github.com/kinfey/SemanticKernelCookBook/blob/main/notebooks/dotNET/05/EmbeddingsWithSK.ipynb
 
-        var kernel = SemanticKernelHelper.GetKernel(textModel,
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel,
             (b, c) =>
             {
                 b.AddLocalTextEmbeddingGeneration();
@@ -73,7 +72,7 @@ internal class QdrantSemanticKernel
                 // if we specify any model; its onnx files needs to be in LocalEmbeddings folder
                 
                 //b.AddOpenAITextEmbeddingGeneration(modelId: "all-minilm", openAIClient: c);//, dimensions: 1536); //all-minilm, mxbai-embed-large, mistral
-                b.AddQdrantVectorStore("localhost");
+                b.AddQdrantVectorStore(hostQdrant);
             });
 
         kernel.Plugins.AddFromType<ClinicPlugins>("Clinic");
@@ -89,7 +88,7 @@ internal class QdrantSemanticKernel
         //var qdrantMemoryBuilder = new MemoryBuilder();
         ////qdrantMemoryBuilder.WithTextEmbeddingGeneration(textEmbedding);
         ////qdrantMemoryBuilder.wit
-        //qdrantMemoryBuilder.WithQdrantMemoryStore("http://localhost:6333", 1536);
+        //qdrantMemoryBuilder.WithQdrantMemoryStore(urlQdrant, 1536);
         //var qdrantBuilder = qdrantMemoryBuilder.Build();
 
 
@@ -97,11 +96,11 @@ internal class QdrantSemanticKernel
         //ISemanticTextMemory memory = new MemoryBuilder()
         //    //.WithMemoryStore(memoryStore)
         //    .WithTextEmbeddingGeneration(embeddingGenerator)
-        //    .WithQdrantMemoryStore(endpoint: "http://localhost:6333", vectorSize: 1536)
+        //    .WithQdrantMemoryStore(endpoint: urlQdrant, vectorSize: 1536)
         //    .Build();
 
         var embeddingGenerator = kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();
-        var memory = new SemanticTextMemory(new QdrantMemoryStore("http://localhost:6333", 384), embeddingGenerator);
+        var memory = new SemanticTextMemory(new QdrantMemoryStore(urlQdrant, 384), embeddingGenerator);
 
         //await memory.ImportTextAsync("Today is October 32nd, 2476");
         //// Generate an answer - This uses OpenAI for embeddings and finding relevant data, and LM Studio to generate an answer
@@ -149,16 +148,16 @@ internal class QdrantSemanticKernel
     }
 
     //https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/GettingStartedWithTextSearch/Step4_Search_With_VectorStore.cs
-    public static async Task SearchScenarioAsync(string textModel, string embeddingModelName, string collectionName)
+    public static async Task SearchScenarioAsync(string urlOllama, string textModel, string embeddingModelName, string hostQdrant, string collectionName)
     {
-        var kernel = SemanticKernelHelper.GetKernel(textModel,
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel,
             (b, c) =>
             {
                 //b.AddOpenAITextEmbeddingGeneration(modelId: embeddingModelName, openAIClient: c);
                 // facing https://github.com/microsoft/semantic-kernel/issues/8833
                 //b.AddLocalTextEmbeddingGeneration();
 
-                b.AddQdrantVectorStore("localhost"); // this is more generalized that register IVectorStore
+                b.AddQdrantVectorStore(hostQdrant); // this is more generalized that register IVectorStore
                 // we can also use AddQdrantVectorStoreRecordCollection that will register IVectorStoreRecordCollection and IVectorizedSearch
                 // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/vector-search
                 // IVectorStoreRecordCollection inherits from IVectorizedSearch
@@ -167,7 +166,7 @@ internal class QdrantSemanticKernel
         // https://learn.microsoft.com/en-us/semantic-kernel/concepts/text-search/out-of-the-box-textsearch/vectorstore-textsearch
         //var textEmbeddingGenerator = kernel.Services.GetRequiredService<ITextEmbeddingGenerationService>();
         IEmbeddingGenerator<string, Embedding<float>> textEmbeddingGenerator = new OllamaEmbeddingGenerator(
-            new Uri("http://localhost:11434/"), embeddingModelName);
+            new Uri(urlOllama), embeddingModelName);
         var vectorStore = kernel.Services.GetRequiredService<IVectorStore>();
 
         IVectorStoreRecordCollection<ulong, Movie> collection = vectorStore.GetCollection<ulong, Movie>(collectionName); // keys can only be ulong or Guid (for Qdrant?)

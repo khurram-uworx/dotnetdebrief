@@ -9,12 +9,12 @@ namespace ChatBots
 {
     internal static class SemanticKernelHelper
     {
-        public static Kernel GetKernel(string textModel, Action<IKernelBuilder, OpenAIClient> action = null)
+        public static Kernel GetKernel(string urlOllama, string textModel, Action<IKernelBuilder, OpenAIClient> action = null)
         {
             var options = new OpenAIClientOptions
             {
-                Endpoint = new Uri("http://127.0.0.1:11434/v1"), // Ollama
-                                                                 // Endpoint = new Uri("http://127.0.0.1:5272/v1") // AI Toolkit
+                Endpoint = new Uri($"{urlOllama}/v1"), // Ollama
+                                                    // Endpoint = new Uri("http://127.0.0.1:5272/v1") // AI Toolkit
                 NetworkTimeout = TimeSpan.FromMinutes(5)
             };
             var openAIClient = new OpenAIClient(new ApiKeyCredential("x"), options);

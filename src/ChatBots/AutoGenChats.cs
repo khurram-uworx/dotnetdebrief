@@ -40,13 +40,13 @@ internal static class AutoGenChats
             maxRound: 10);
     }
 
-    public static async Task HelloOllamaWorldAsync(string textModel)
+    public static async Task HelloOllamaWorldAsync(string urlOllama, string textModel)
     {
         //https://microsoft.github.io/autogen-for-net/articles/AutoGen.Ollama/Chat-with-llama.html
         //
         using var httpClient = new HttpClient()
         {
-            BaseAddress = new Uri("http://localhost:11434"),
+            BaseAddress = new Uri(urlOllama),
         };
 
         var ollamaAgent = new OllamaAgent(
@@ -61,13 +61,13 @@ internal static class AutoGenChats
         Console.WriteLine($"{reply.From} {reply.GetContent()}");
     }
 
-    public static async Task HelloAgents(string textModel)
+    public static async Task HelloAgents(string urlOllama, string textModel)
     {
         //https://microsoft.github.io/autogen-for-net/articles/Two-agent-chat.html
 
         using var httpClient = new HttpClient()
         {
-            BaseAddress = new Uri("http://localhost:11434"),
+            BaseAddress = new Uri(urlOllama),
             Timeout = TimeSpan.FromMinutes(5)
         };
 

@@ -8,11 +8,11 @@ namespace ChatBots;
 
 internal static class OpenAI
 {
-    public static void Run(string textModel)
+    public static void Run(string urlOllama, string textModel)
     {
         var options = new OpenAIClientOptions
         {
-            Endpoint = new Uri("http://127.0.0.1:11434/v1") // Ollama
+            Endpoint = new Uri($"{urlOllama}/v1") // Ollama
             // Endpoint = new Uri("http://127.0.0.1:5272/v1") // AI Toolkit
         };
 

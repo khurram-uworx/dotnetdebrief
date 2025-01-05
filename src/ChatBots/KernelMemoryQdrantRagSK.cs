@@ -133,18 +133,18 @@ internal class KernelMemoryQdrantRagSK
         }
     }
 
-    public static async Task RagDocumentsScenarioAsync(string textModel, string embeddingModelName)
+    public static async Task RagDocumentsScenarioAsync(string urlOllama, string textModel, string embeddingModelName, string urlQdrant, string hostQdrant)
     {
         //https://github.com/microsoft/kernel-memory/blob/main/examples/302-dotnet-sk-km-chat/Program.cs
-        var kernel = SemanticKernelHelper.GetKernel(textModel,
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel,
             (b, c) =>
             {
-                b.AddQdrantVectorStore("localhost");
+                b.AddQdrantVectorStore(hostQdrant);
             });
 
         var config = new OllamaConfig
         {
-            Endpoint = "http://localhost:11434",
+            Endpoint = urlOllama,
             TextModel = new OllamaModelConfig(textModel, maxToken: 131072),
             EmbeddingModel = new OllamaModelConfig(embeddingModelName, maxToken: 2048) // nomic-embed-text
         };
@@ -158,7 +158,7 @@ internal class KernelMemoryQdrantRagSK
                 l.AddSimpleConsole(c => c.SingleLine = true);
             }))
             .WithSimpleFileStorage(new SimpleFileStorageConfig { StorageType = FileSystemTypes.Disk }) // local file storage
-            .WithQdrantMemoryDb(endpoint: "http://localhost:6333", apiKey: "x")
+            .WithQdrantMemoryDb(endpoint: urlQdrant, apiKey: "x")
             .Build<MemoryServerless>();
 
         //https://github.com/microsoft/kernel-memory/blob/main/examples/302-dotnet-sk-km-chat/Program.cs
@@ -214,7 +214,7 @@ internal class KernelMemoryQdrantRagSK
         await ChatLoop(kernel, memory, systemPrompt, isStreaming: true);
     }
 
-    public static async Task ClinicScenarioAsync(string textModel, string embeddingModelName)
+    public static async Task ClinicScenarioAsync(string urlOllama, string textModel, string embeddingModelName, string urlQdrant, string hostQdrant)
     {
         // https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/Demos/VectorStoreRAG/README.md
         // https://github.com/microsoft/kernel-memory/blob/main/extensions/Qdrant/Qdrant.TestApplication/Program.cs
@@ -224,21 +224,21 @@ internal class KernelMemoryQdrantRagSK
         //https://github.com/microsoft/semantic-kernel/blob/21f8a278e55c23b34e96c9de3ab06e8564dca703/docs/decisions/00NN-text-search.md
         //https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/Demos/VectorStoreRAG/README.md
 
-        var kernel = SemanticKernelHelper.GetKernel(textModel,
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel,
             (b, c) =>
             {
                 //b.AddInMemoryVectorStore();
 
-                //b.Services.AddSingleton<QdrantClient>(sp => new QdrantClient("localhost"));
+                //b.Services.AddSingleton<QdrantClient>(sp => new QdrantClient(hostQdrant));
                 //b.AddQdrantVectorStore();
-                b.AddQdrantVectorStore("localhost");
+                b.AddQdrantVectorStore(hostQdrant);
             });
 
         kernel.Plugins.AddFromType<ClinicPlugins>("Clinic");
 
         var config = new OllamaConfig
         {
-            Endpoint = "http://localhost:11434",
+            Endpoint = urlOllama,
             TextModel = new OllamaModelConfig(textModel, maxToken: 131072), // mistral, calebfahlgren/natural-functions, granite-code:8b ?
             EmbeddingModel = new OllamaModelConfig(embeddingModelName, maxToken: 2048)
         };
@@ -252,7 +252,7 @@ internal class KernelMemoryQdrantRagSK
         //        return true;
         //    };
         //var client = new HttpClient(handler);
-        //var memoryStore = new QdrantMemoryStore(httpClient: client, vectorSize: 1536, endpoint: "http://localhost:6333");
+        //var memoryStore = new QdrantMemoryStore(httpClient: client, vectorSize: 1536, endpoint: urlQdrant);
         //var memory = new SemanticTextMemory(memoryStore, embeddingGenerator);
 
         IKernelMemory memory = new KernelMemoryBuilder()
@@ -263,7 +263,7 @@ internal class KernelMemoryQdrantRagSK
                 l.SetMinimumLevel(LogLevel.Warning);
                 l.AddSimpleConsole(c => c.SingleLine = true);
             }))
-            .WithQdrantMemoryDb(endpoint: "http://localhost:6333", apiKey: "x")
+            .WithQdrantMemoryDb(endpoint: urlQdrant, apiKey: "x")
             .Build<MemoryServerless>();
 
         Console.WriteLine("# Saving facts into kernel memory...");

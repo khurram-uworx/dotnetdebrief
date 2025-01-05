@@ -20,7 +20,7 @@ internal static class AIExtensionTools
         public string[] languages { get; set; }
     }
 
-    public static async Task ChatWithAIExtensionAsync(string textModel)
+    public static async Task ChatWithAIExtensionAsync(string urlOllama, string textModel)
     {
         [Description("Gets the weather")]
         string GetWeather() => "It's raining";
@@ -29,7 +29,7 @@ internal static class AIExtensionTools
         //    : "It's raining";
 
         // https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.AI.Ollama
-        IChatClient chatClient = new OllamaChatClient(new Uri("http://localhost:11434/"), textModel)
+        IChatClient chatClient = new OllamaChatClient(new Uri(urlOllama), textModel)
             .AsBuilder()
             .UseFunctionInvocation()
             .Build();

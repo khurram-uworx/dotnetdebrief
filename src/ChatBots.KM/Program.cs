@@ -6,12 +6,16 @@ internal static class Program
 {
     static async Task Main(string[] args)
     {
-        //docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant
+        var urlOllama = "http://localhost:11434";
 
-        await KernelMemoryQdrantRag.RagWikipediaScenarioAsync(textModel: "phi3", embeddingModelName: "mxbai-embed-large");
+        //docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant
+        var urlQdrant = "http://localhost:6333";
+        var hostQdrant = "localhost";
+
+        await KernelMemoryQdrantRag.RagWikipediaScenarioAsync(urlOllama, textModel: "llama3.2", embeddingModelName: "all-minilm", urlQdrant);
 
         // Not working AI Extensions throwing Service not found
-        // await KernelMemoryQdrantRagSK.RagDocumentsScenarioAsync(textModel: "phi3", embeddingModelName: "mxbai-embed-large");
-        //await KernelMemoryQdrantRagSK.ClinicScenarioAsync(textModel: "llama3.2", embeddingModelName: "mxbai-embed-large"); //"calebfahlgren/natural-functions"
+        //await KernelMemoryQdrantRagSK.RagDocumentsScenarioAsync(urlOllama, textModel: "llama3.2", embeddingModelName: "all-minilm", urlQdrant, hostQdrant);
+        //await KernelMemoryQdrantRagSK.ClinicScenarioAsync(urlOllama, textModel: "llama3.2", embeddingModelName: "all-minilm", urlQdrant, hostQdrant); //"calebfahlgren/natural-functions"
     }
 }

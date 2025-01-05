@@ -17,8 +17,8 @@
     <PackageReference Include="Microsoft.KernelMemory.AI.Ollama" Version="0.95.241216.2" />
     <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.95.241216.2" />
     <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Qdrant" Version="0.95.241216.2" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.32.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.32.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.33.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.33.0-preview" />
   </ItemGroup>
 
 </Project>
