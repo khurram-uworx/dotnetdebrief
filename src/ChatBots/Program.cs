@@ -1,58 +1,86 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ChatBots;
 
 internal static class Program
 {
-    /*
-     * all-minilm all-MiniLM-L6-v2
-     *      Best for lightweight, fast, and general-purpose use cases where resource efficiency is critical
-     * nomic-embed-text
-     *      A balanced choice for general-purpose tasks with a focus on transparency and ethical AI
-     * mxbai-embed-text / nomic-embed-large
-     *      Ideal for high-performance, multilingual, and complex tasks where accuracy and richness of
-     *      embeddings are prioritized over speed and resource usage
-     */
-
     static async Task Main(string[] args)
     {
         var urlOllama = "http://localhost:11434";
+        /*
+         * all-minilm all-MiniLM-L6-v2
+         *      Best for lightweight, fast, and general-purpose use cases where resource efficiency is critical
+         * nomic-embed-text / nomic-embed-large
+         *      A balanced choice for general-purpose tasks with a focus on transparency and ethical AI
+         * mxbai-embed-text / mxbai-embed-large
+         *      Ideal for high-performance, multilingual, and complex tasks where accuracy and richness of
+         *      embeddings are prioritized over speed and resource usage
+         */
+        var embeddingModelName = "all-minilm";
+        /*
+         * phi3/phi3:mini/phi3:latest
+         * llama2 and phi3 dont support tools
+         *      calebfahlgren/natural-functions
+         * mistral
+         */
+        var textModel = "llama3.2";
 
-        //OpenAI.Run(urlOllama, textModel: "phi3:mini");
-        //ML.MLTest(textModel: "directml-int4-awq-block-128");
+        var options = new Dictionary<int, Action>();
+        Console.WriteLine("Ensure your Ollama is up; choose your chat bot");
+        
+        Console.WriteLine("[1] OpenAI Library Chat Completion");
+        options.Add(1, () => OpenAI.Run(urlOllama, textModel));
 
-        //OpenAITools.ChatWithTools(urlOllama, textModel: "mistral");
+        Console.WriteLine("[2] DirectML Chat Completion");
+        options.Add(2, () => ML.MLTest(textModel: "directml-int4-awq-block-128"));
 
-        //await AutoGenChats.HelloOllamaWorldAsync(urlOllama, textModel: "phi3:latest");
-        //await AutoGenChats.HelloAgents(urlOllama, textModel: "mistral");
-        // https://microsoft.github.io/autogen-for-net/articles/Built-in-messages.html
+        Console.WriteLine("[3] OptionAI Tools");
+        options.Add(3, () => OpenAITools.ChatWithTools(urlOllama, textModel));
 
-        // llama2 and phi3 dont support tools
-        //await SemanticKernelChats.HelloWorldAsync(urlOllama, textModel: "mistral");
-        //await SemanticKernelChats.PromptScenarioAsync(urlOllama, textModel: "mistral");
-        //await SemanticKernelChats.LightsPluginAsync(urlOllama, textModel: "mistral");    // User: Please toggle all the lights
-        //await SemanticKernelChats.RagScenarioAsync(urlOllama, textModel: "mistral");     // not working because of Semantic kernel
-        //                                                                          with ollama text embedding search does not return any value
-        // https://github.com/microsoft/semantic-kernel/issues/6483
+        Console.WriteLine("[4] AutoGen Hello World");
+        options.Add(4, () => AutoGenChats.HelloOllamaWorldAsync(urlOllama, textModel).Wait());
+        Console.WriteLine("[5] AutoGen Hello Agents");
+        options.Add(5, () => AutoGenChats.HelloAgents(urlOllama, textModel).Wait());
+        //https://microsoft.github.io/autogen-for-net/articles/Built-in-messages.html
 
-        await AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel: "llama3.2");
+        Console.WriteLine("[11] Semantic Kernel (SK) Hello World");
+        options.Add(11, () => SemanticKernelChats.HelloWorldAsync(urlOllama, textModel).Wait());
+        Console.WriteLine("[12] SK Prompt Scenario");
+        options.Add(12, () => SemanticKernelChats.PromptScenarioAsync(urlOllama, textModel).Wait());
+        Console.WriteLine("[13] SK Plugin; try Please toggle all the lights");
+        options.Add(13, () => SemanticKernelChats.LightsPluginAsync(urlOllama, textModel).Wait());
+        Console.WriteLine("[14] SK RAG Scenario");
+        options.Add(14, () => SemanticKernelChats.RagScenarioAsync(urlOllama, textModel).Wait());
 
-        //docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant
+        Console.WriteLine("[21] AI Extensions Chat Completition and Tool");
+        options.Add(21, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
+
+        Console.WriteLine("Run Qdrant first; docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant");
         var urlQdrant = "http://localhost:6333";
         var hostQdrant = "localhost";
 
-        //await Qdrant.QuickStartAsync(hostQdrant, collectionName: "test_collection");
-        //await Qdrant.VectorDataExtensionsAsync(urlOllama, embeddingModelName: "all-minilm", hostQdrant, collectionName: "movies");
+        Console.WriteLine("[31] Qdrant Quick Start, test_collection will be created/used");
+        options.Add(31, () => Qdrant.QuickStartAsync(hostQdrant, collectionName: "test_collection").Wait());
+        Console.WriteLine("[32] Qdrant with Vector Data Extensions, movies collection will be created/used");
+        options.Add(32, () => Qdrant.VectorDataExtensionsAsync(urlOllama, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
+        Console.WriteLine("[33] Qdrant RAG Scenario - Clinic");
+        options.Add(33, () => QdrantSemanticKernel.RagClinicScenarioAsync(urlOllama, textModel, urlQdrant, hostQdrant, memoryCollectionName: "timingFacts").Wait());
+        Console.WriteLine("[34] Qdrant Semantic Search, movies collection will be created/used");
+        options.Add(34, () => QdrantSemanticKernel.SearchScenarioAsync(urlOllama, textModel, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
+        Console.WriteLine("[35] Qdrant as Semantic Kernel Memory; RAG for wikipedia");
+        options.Add(35, () => KernelMemoryQdrantRag.RagWikipediaScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant).Wait());
+        Console.WriteLine("[36] Qdrant as Semantic Kernel Memory; RAG for web pages (SK docs)");
+        options.Add(36, () => KernelMemoryQdrantRagSK.RagDocumentsScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant, hostQdrant).Wait());
+        Console.WriteLine("[37] Kernel Memory with Qdrant and RAG Scenario - Clinic using Semantic Kernel");
+        options.Add(37, () => KernelMemoryQdrantRagSK.ClinicScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant, hostQdrant).Wait());
 
-        //await QdrantSemanticKernel.RagClinicScenarioAsync(urlOllama, textModel: "llama3.2", urlQdrant, hostQdrant, memoryCollectionName: "timingFacts");
-        //await QdrantSemanticKernel.SearchScenarioAsync(urlOllama, textModel: "llama3.2", embeddingModelName: "all-minilm", hostQdrant, collectionName: "movies");
-
-        // Not working AI Extensions throwing Service not found
-        //await KernelMemoryQdrantRag.RagWikipediaScenarioAsync(urlOllama, textModel: "phi3", embeddingModelName: "all-minilm", urlQdrant); //mxbai-embed-large
-
-        // Not working AI Extensions throwing Service not found
-        //await KernelMemoryQdrantRagSK.RagDocumentsScenarioAsync(urlOllama, textModel: "phi3", embeddingModelName: "all-minilm", urlQdrant, hostQdrant); //mxbai-embed-large
-        //await KernelMemoryQdrantRagSK.ClinicScenarioAsync(urlOllama, textModel: "llama3.2", embeddingModelName: "all-minilm", urlQdrant, hostQdrant); //"calebfahlgren/natural-functions", mxbai-embed-large
+        int option;
+        if (int.TryParse(Console.ReadLine(), out option) && options.ContainsKey(option))
+            options[option]();
+        else
+            Console.WriteLine("Invalid option");
 
         //https://learn.microsoft.com/en-us/semantic-kernel/how-to/vector-store-connectors/vector-store-data-ingestion
         //https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/Concepts/Memory/TextChunkingAndEmbedding.cs

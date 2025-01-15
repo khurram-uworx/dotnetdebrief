@@ -172,7 +172,9 @@ internal class QdrantSemanticKernel
         IVectorStoreRecordCollection<ulong, Movie> collection = vectorStore.GetCollection<ulong, Movie>(collectionName); // keys can only be ulong or Guid (for Qdrant?)
         var embeddings = await textEmbeddingGenerator.GenerateEmbeddingAsync("A family friendly movie");
         ReadOnlyMemory<float> searchVector = embeddings.Vector; //embeddings.Data;
-        
+
+        await Qdrant.CreateMovieCollectionAsync(textEmbeddingGenerator, vectorStore, collectionName);
+
         // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/vector-search?pivots=programming-language-csharp
         // Do the search, passing an options object with a Top value to limit resulst to the single top match.
         var searchResult = await collection.VectorizedSearchAsync(searchVector, new() { Top = 1 });

@@ -136,7 +136,9 @@ Give me a TLDR with the fewest words.";
         //https://elbruno.com/2024/06/17/full-rag-scenario-using-phi3-semantickernel-and-textmemory-in-local-mode/
         //https://techcommunity.microsoft.com/t5/educator-developer-blog/building-intelligent-applications-with-local-rag-in-net-and-phi/ba-p/4175721
 
-        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel, (b, _) => b.AddLocalTextEmbeddingGeneration());
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama,
+            textModel,
+            (b, _) => b.AddLocalTextEmbeddingGeneration());
 
         var question = "What is Bruno's favourite super hero?";
         Console.WriteLine($"This program will answer the following question: {question}");
@@ -163,11 +165,16 @@ Give me a TLDR with the fewest words.";
         // add facts to the collection
         const string MemoryCollectionName = "fanFacts";
 
-        await memory.SaveInformationAsync(MemoryCollectionName, id: "info1", text: "Gisela's favourite super hero is Batman");
-        await memory.SaveInformationAsync(MemoryCollectionName, id: "info2", text: "The last super hero movie watched by Gisela was Guardians of the Galaxy Vol 3");
-        await memory.SaveInformationAsync(MemoryCollectionName, id: "info3", text: "Bruno's favourite super hero is Invincible");
-        await memory.SaveInformationAsync(MemoryCollectionName, id: "info4", text: "The last super hero movie watched by Bruno was Aquaman II");
-        await memory.SaveInformationAsync(MemoryCollectionName, id: "info5", text: "Bruno don't like the super hero movie: Eternals");
+        await memory.SaveInformationAsync(MemoryCollectionName, id: "info1",
+            text: "Gisela's favourite super hero is Batman");
+        await memory.SaveInformationAsync(MemoryCollectionName, id: "info2",
+            text: "The last super hero movie watched by Gisela was Guardians of the Galaxy Vol 3");
+        await memory.SaveInformationAsync(MemoryCollectionName, id: "info3",
+            text: "Bruno's favourite super hero is Invincible");
+        await memory.SaveInformationAsync(MemoryCollectionName, id: "info4",
+            text: "The last super hero movie watched by Bruno was Aquaman II");
+        await memory.SaveInformationAsync(MemoryCollectionName, id: "info5",
+            text: "Bruno don't like the super hero movie: Eternals");
 
         TextMemoryPlugin memoryPlugin = new(memory);
 
@@ -180,8 +187,8 @@ Give me a TLDR with the fewest words.";
         };
 
         var prompt = @"
-Question: {{$input}}
-Answer the question using the memory content: {{Recall}}";
+            Question: {{$input}}
+            Answer the question using the memory content: {{Recall}}";
 
         var arguments = new KernelArguments(settings)
         {

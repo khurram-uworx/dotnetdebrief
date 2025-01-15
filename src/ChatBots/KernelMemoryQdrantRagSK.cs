@@ -263,6 +263,7 @@ internal class KernelMemoryQdrantRagSK
                 l.SetMinimumLevel(LogLevel.Warning);
                 l.AddSimpleConsole(c => c.SingleLine = true);
             }))
+            .WithSimpleFileStorage(new SimpleFileStorageConfig { StorageType = FileSystemTypes.Disk }) // local file storage
             .WithQdrantMemoryDb(endpoint: urlQdrant, apiKey: "x")
             .Build<MemoryServerless>();
 
