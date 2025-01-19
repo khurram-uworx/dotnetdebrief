@@ -5,7 +5,7 @@ using OpenAI;
 using System;
 using System.ClientModel;
 
-namespace ChatBots
+namespace ChatBots.Helpers
 {
     internal static class SemanticKernelHelper
     {
@@ -14,7 +14,7 @@ namespace ChatBots
             var options = new OpenAIClientOptions
             {
                 Endpoint = new Uri($"{urlOllama}/v1"), // Ollama
-                                                    // Endpoint = new Uri("http://127.0.0.1:5272/v1") // AI Toolkit
+                                                       // Endpoint = new Uri("http://127.0.0.1:5272/v1") // AI Toolkit
                 NetworkTimeout = TimeSpan.FromMinutes(5)
             };
             var openAIClient = new OpenAIClient(new ApiKeyCredential("x"), options);

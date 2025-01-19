@@ -2,6 +2,7 @@
 #pragma warning disable SKEXP0020
 #pragma warning disable SKEXP0050
 
+using ChatBots.Helpers;
 using ChatBots.Models;
 using ChatBots.Plugins;
 using Microsoft.Extensions.AI;
@@ -58,7 +59,7 @@ internal class QdrantSemanticKernel
         }
     }
 
-    public static async Task RagClinicScenarioAsync(string urlOllama, string textModel, string urlQdrant, string hostQdrant, string memoryCollectionName)
+    public static async Task RagClinicScenarioAsync(string urlOllama, string textModel, string urlQdrant, string hostQdrant, string collectionName)
     {
         // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/qdrant-connector
         // https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/code-samples
@@ -108,16 +109,16 @@ internal class QdrantSemanticKernel
         //Console.WriteLine(answer.Question);
         //Console.WriteLine(answer.Result);
 
-        await memory.SaveInformationAsync(memoryCollectionName,
+        await memory.SaveInformationAsync(collectionName,
             "Today is friday",
             id: "dayOfWeek");
-        await memory.SaveInformationAsync(memoryCollectionName,
+        await memory.SaveInformationAsync(collectionName,
             "Clinic opens in morning from 10AM to 1PM, Mondays to Saturdays, Friday is off",
             id: "timing1");
-        await memory.SaveInformationAsync(memoryCollectionName,
+        await memory.SaveInformationAsync(collectionName,
             "Clinic opens in evening from 6PM to 8PM, Mondays to Wednesdays only, for the rest of the week clinic is off in evening",
             id: "timing2");
-        await memory.SaveInformationAsync(memoryCollectionName,
+        await memory.SaveInformationAsync(collectionName,
             "Clinic is off on Sunday",
             id: "timing3");
 
@@ -139,7 +140,7 @@ internal class QdrantSemanticKernel
             q => new KernelArguments(settings)
             {
                 { "input", q },
-                { "collection", memoryCollectionName }
+                { "collection", collectionName }
             });
 
         var question = "Will clinic open later in the day today?";
@@ -190,6 +191,7 @@ internal class QdrantSemanticKernel
 
         if (collection is IVectorizedSearch<Movie> vectorizedSearch)
         {
+            // https://learn.microsoft.com/en-us/semantic-kernel/concepts/text-search/text-search-vector-stores
             var textSearch = new VectorStoreTextSearch<Movie>(vectorizedSearch, new OllamaTextEmbeddingService(
                 textEmbeddingGenerator as OllamaEmbeddingGenerator));
             var searchPlugin = textSearch.CreateWithGetTextSearchResults("SearchPlugin");
@@ -210,7 +212,8 @@ internal class QdrantSemanticKernel
 
                 Include citations to the relevant information where it is referenced in the response.
                 """;
-            KernelArguments arguments = new() { { "query", query } };
+            // penAIPromptExecutionSettings settings = new() { FunctionChoiceBehavior = FunctionChoiceBehavior.Auto() };
+            KernelArguments arguments = new() { { "query", query } }; // KernelArguments arguments = new(settings);
             HandlebarsPromptTemplateFactory promptTemplateFactory = new();
             Console.WriteLine(await kernel.InvokePromptAsync(
                 promptTemplate,

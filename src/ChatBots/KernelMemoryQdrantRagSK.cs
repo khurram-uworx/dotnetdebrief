@@ -1,4 +1,6 @@
-﻿using ChatBots.Plugins;
+﻿using ChatBots.Helpers;
+using ChatBots.Plugins;
+using Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.KernelMemory;
@@ -7,11 +9,8 @@ using Microsoft.KernelMemory.AI.Ollama;
 using Microsoft.KernelMemory.DocumentStorage.DevTools;
 using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,82 +19,6 @@ namespace ChatBots;
 
 internal class KernelMemoryQdrantRagSK
 {
-    private static async Task<string> GetLongTermMemory(IKernelMemory memory, string query, bool asChunks = true)
-    {
-        if (asChunks)
-        {
-            // Fetch raw chunks, using KM indexes. More tokens to process with the chat history, but only one LLM request.
-            SearchResult memories = await memory.SearchAsync(query, limit: 10);
-            return memories.Results.SelectMany(m => m.Partitions).Aggregate("", (sum, chunk) => sum + chunk.Text + "\n").Trim();
-        }
-
-        // Use KM to generate an answer. Fewer tokens, but one extra LLM request.
-        MemoryAnswer answer = await memory.AskAsync(query);
-        return answer.Result.Trim();
-    }
-
-    private static async Task ChatLoop(Kernel kernel, IKernelMemory memory,
-        string systemPrompt, bool isStreaming, 
-        PromptExecutionSettings settings = null)
-    {
-        var chatService = kernel.GetRequiredService<IChatCompletionService>();
-        var chatHistory = new ChatHistory(systemPrompt);
-
-        // Start the chat
-        var assistantMessage = "Hello, how can I help?";
-        Console.WriteLine($"Assistant> {assistantMessage}\n");
-        chatHistory.AddAssistantMessage(assistantMessage);
-
-        // Infinite chat loop
-        var reply = new StringBuilder();
-
-        while (true)
-        {
-            // Get user message (retry if the user enters an empty string)
-            Console.Write("You> ");
-            var userMessage = Console.ReadLine()?.Trim();
-            if (string.IsNullOrWhiteSpace(userMessage)) { break; }
-            else { chatHistory.AddUserMessage(userMessage); }
-
-            // Recall relevant information from memory
-            var longTermMemory = await GetLongTermMemory(memory, userMessage);
-            // Console.WriteLine("-------------------------- recall from memory\n{longTermMemory}\n--------------------------");
-
-            // Inject the memory recall in the initial system message
-            chatHistory[0].Content = $"{systemPrompt}\n\nLong term memory:\n{longTermMemory}";
-
-            reply.Clear();
-
-            // Get the response from the AI
-            if (isStreaming)
-            {
-                Console.Write("\nAssistant> ");
-
-                await foreach (StreamingChatMessageContent stream in chatService.GetStreamingChatMessageContentsAsync(
-                    chatHistory, executionSettings: settings, kernel: kernel))
-                {
-                    Console.Write(stream.Content);
-                    reply.Append(stream.Content);
-                }
-            }
-            else
-            {
-                var aiReply = await chatService.GetChatMessageContentAsync(
-                    chatHistory,
-                    executionSettings: settings,
-                    kernel: kernel);
-
-                Console.WriteLine("Assistant> " + aiReply);
-
-                // Add the message from the agent to the chat history
-                chatHistory.AddMessage(aiReply.Role, aiReply.Content ?? string.Empty);
-            }
-
-            chatHistory.AddAssistantMessage(reply.ToString());
-            Console.WriteLine("\n");
-        }
-    }
-
     private static async Task MemorizeDocumentsAsync(IKernelMemory memory, List<string> pages)
     {
         Func<string, string> GetUrlId = url => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(url))).ToUpperInvariant();
@@ -113,22 +36,6 @@ internal class KernelMemoryQdrantRagSK
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Failed for {url} with {ex.Message}");
-                }
-        }
-    }
-
-    private static async Task MemorizeTextAsync(IKernelMemory memory, (string, string)[] facts)
-    {
-        foreach (var fact in facts)
-        {
-            if (!await memory.IsDocumentReadyAsync(fact.Item1))
-                try
-                {
-                    await memory.ImportTextAsync(fact.Item2, documentId: fact.Item1);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed for {fact.Item1} with {ex.Message}");
                 }
         }
     }
@@ -211,7 +118,7 @@ internal class KernelMemoryQdrantRagSK
 
         // Infinite chat loop
         Console.WriteLine("# Starting chat...");
-        await ChatLoop(kernel, memory, systemPrompt, isStreaming: true);
+        await kernel.ChatLoop(memory, systemPrompt, isStreaming: true);
     }
 
     public static async Task ClinicScenarioAsync(string urlOllama, string textModel, string embeddingModelName, string urlQdrant, string hostQdrant)
@@ -268,7 +175,7 @@ internal class KernelMemoryQdrantRagSK
             .Build<MemoryServerless>();
 
         Console.WriteLine("# Saving facts into kernel memory...");
-        await MemorizeTextAsync(memory, new[]
+        await memory.MemorizeTextAsync(new[]
         {
             //("dayOfWeek", "Today is friday"),
             ("timing1", "Clinic opens in morning from 10AM to 1PM, Mondays, Tuesdays, Wednesdays, Thursdays, Fridays and Saturdays"),
@@ -276,7 +183,7 @@ internal class KernelMemoryQdrantRagSK
             ("timing3", "Clinic is off on Sunday")
         });
 
-        OpenAIPromptExecutionSettings settings = new()
+        PromptExecutionSettings settings = new()
         {
             //ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions, // this cant be used together with FunctionChoiceBehavior
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
@@ -293,13 +200,14 @@ internal class KernelMemoryQdrantRagSK
         //    """;
         var systemPrompt = """
             You are the clinic assistant who guides and answers the patients.
+            Today is friday; dont check for this.
 
             Question: {{$input}}
             Answer the question using the tool call results; be succinct and if you feel like it call another tool / function
             """;
 
         // https://github.com/microsoft/kernel-memory/blob/main/examples/003-dotnet-SemanticKernel-plugin/Program.cs
-        var promptOptions = new OpenAIPromptExecutionSettings { ChatSystemPrompt = "Answer or say \"I don't know\".", MaxTokens = 100, Temperature = 0, TopP = 0 };
+        //var promptOptions = new OpenAIPromptExecutionSettings { ChatSystemPrompt = "Answer or say \"I don't know\".", MaxTokens = 100, Temperature = 0, TopP = 0 };
 
         ////https://medium.com/@johnkane24/local-memory-c-semantic-kernel-ollama-and-sqlite-to-manage-chat-memories-locally-9b779fc56432
         //var getArguments = new Func<string, KernelArguments>(
@@ -315,6 +223,6 @@ internal class KernelMemoryQdrantRagSK
 
         // Infinite chat loop
         Console.WriteLine("# Starting chat...");
-        await ChatLoop(kernel, memory, systemPrompt, isStreaming: false, settings);
+        await kernel.ChatLoop(memory, systemPrompt, isStreaming: false, settings);
     }
 }

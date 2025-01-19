@@ -15,10 +15,15 @@ class ClinicPlugins
     }
 
     [KernelFunction("make_appointment")]
-    [Description("Makes an appointment with clinic; one can make an appointment for future days as well. Before making an appointment; ask the user his mobile number and ensure its valid Pakistan mobile number, appointments can only be made for evenings")]
+    [Description("Makes an appointment with clinic; one can make an appointment for future days as well. Before making an appointment; ask the user his mobile number and ensure its valid mobile number, valid mobile numbers are 11 digits and start with 03, appointments can only be made for evenings")]
     [return: Description("Will tell if appointment of given day of week is made or not; if slot/time is not available it will tell 'Not Available', suggest next day if slot/time is not available")]
     public string MakeAppointmentAsync(string phoneNumber, string dayOfWeek)
     {
-        return $"Appointment for {phoneNumber} is made for 6PM on {dayOfWeek}";
+        if (phoneNumber is null || !phoneNumber.StartsWith("03") || phoneNumber.Length < 11)
+            return "I need a valid mobile phone number";
+        if (dayOfWeek is null)
+            return "I need a valid day";
+        else
+            return $"Appointment for {phoneNumber} is made for 6PM on {dayOfWeek}";
     }
 }
