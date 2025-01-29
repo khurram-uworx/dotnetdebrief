@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenAI.ServiceDefaults", "Ge
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VectorDatabases", "VectorDatabases\VectorDatabases.csproj", "{307DC730-862D-4D86-8516-3C2AE592E382}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rpa", "Rpa\Rpa.csproj", "{ACEF1852-5304-4943-9466-E2C39C02F369}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{307DC730-862D-4D86-8516-3C2AE592E382}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{307DC730-862D-4D86-8516-3C2AE592E382}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{307DC730-862D-4D86-8516-3C2AE592E382}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACEF1852-5304-4943-9466-E2C39C02F369}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACEF1852-5304-4943-9466-E2C39C02F369}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACEF1852-5304-4943-9466-E2C39C02F369}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACEF1852-5304-4943-9466-E2C39C02F369}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
