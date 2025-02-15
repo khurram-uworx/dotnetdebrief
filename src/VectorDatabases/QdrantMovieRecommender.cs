@@ -5,7 +5,7 @@ using VectorDatabases.Data;
 
 namespace VectorDatabases;
 
-internal class QdrantMovieRecommender
+class QdrantMovieRecommender
 {
     //https://qdrant.tech/documentation/advanced-tutorials/collaborative-filtering/
     //https://github.com/qdrant/examples/blob/master/collaborative-filtering/collaborative-filtering.ipynb
@@ -82,6 +82,12 @@ internal class QdrantMovieRecommender
             });
         }
 
+        /*
+         * Comparability – Different rating sources or users may have different rating scales (e.g., some may rate harshly, others leniently)
+         * Machine Learning – Many ML algorithms work better when input data has zero mean and unit variance (standardization). This helps avoid biases in training
+         * Reducing Bias – Some users may consistently give higher or lower ratings than others. Normalization helps adjust for individual tendencies
+         * Stability in Aggregation – If ratings come from multiple sources, normalization ensures fair weighting when aggregating scores.
+         */
         Console.WriteLine("Normalizing ratings...");
         var mean = ratings.Average(r => r.RatingValue);
         var std = (float)Math.Sqrt(ratings.Average(r => Math.Pow(r.RatingValue - mean, 2)));

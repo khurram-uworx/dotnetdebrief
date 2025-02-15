@@ -28,6 +28,10 @@ namespace Notepad.Commands_Binding
         /// </summary>
         public static RoutedUICommand SearchWithBing { get; private set; }
 
+        public static RoutedUICommand MakeItProfessional { get; private set; }
+
+        public static RoutedUICommand PassToLanguageModel { get; private set; }
+
         /// <summary>
         /// Represents a custom command to find the next occurrence.
         /// </summary>
@@ -81,6 +85,16 @@ namespace Notepad.Commands_Binding
             SearchWithBing = new RoutedUICommand("Search with Bing...", "SearchWithBing", typeof(CustomNotepadCommands), new InputGestureCollection
             {
                 new KeyGesture(Key.E, ModifierKeys.Control, "Ctrl+E")
+            });
+
+            MakeItProfessional = new RoutedUICommand("Make it professional...", "MaleItProfessional", typeof(CustomNotepadCommands), new InputGestureCollection
+            {
+                new KeyGesture(Key.F10, ModifierKeys.Control, "F10")
+            });
+
+            PassToLanguageModel = new RoutedUICommand("Pass to model...", "PassToLanguageModel", typeof(CustomNotepadCommands), new InputGestureCollection
+            {
+                new KeyGesture(Key.F11, ModifierKeys.Control, "F11")
             });
 
             // Create a custom command to find the next occurrence with the key gesture F3

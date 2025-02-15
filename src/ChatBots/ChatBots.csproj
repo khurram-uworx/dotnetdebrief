@@ -9,20 +9,48 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="PromptTemplates\AristotleAgent.yaml" />
-    <None Remove="PromptTemplates\SocratesAgent.yaml" />
+    <None Remove="DebateAgents\AristotleAgent.yaml" />
+    <None Remove="DebateAgents\editor.yaml" />
+    <None Remove="DebateAgents\marketing.yaml" />
+    <None Remove="DebateAgents\researcher.yaml" />
+    <None Remove="DebateAgents\SocratesAgent.yaml" />
+    <None Remove="DebateAgents\writer.yaml" />
     <None Remove="Resources\Plato.pdf" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="PromptTemplates\AristotleAgent.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="TicketAgents\3-PriorityAssessor.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PromptTemplates\PlatoAgent.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="TicketAgents\2-TicketCategorizer.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PromptTemplates\SocratesAgent.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="TicketAgents\1-TicketDetailsExtractor.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TicketAgents\4-RecommendationGenerator.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DebateAgents\AristotleAgent.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WriterAgents\editor.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WriterAgents\marketing.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DebateAgents\PlatoAgent.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WriterAgents\researcher.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DebateAgents\SocratesAgent.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WriterAgents\writer.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Plato.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -31,24 +59,24 @@
 
   <ItemGroup>
     <PackageReference Include="AutoGen" Version="0.2.1" />
-    <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.2.0-beta.1" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="9.1.0-preview.1.25064.3" />
     <PackageReference Include="Microsoft.Extensions.AI.Ollama" Version="9.1.0-preview.1.25064.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" Version="9.0.0-preview.1.25078.1" />
-    <PackageReference Include="Microsoft.KernelMemory.AI.Ollama" Version="0.96.250120.1" />
-    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.96.250120.1" />
-    <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.96.250120.1" />
-    <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Qdrant" Version="0.96.250120.1" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.5.2" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.35.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.35.0-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.InMemory" Version="1.35.0-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Postgres" Version="1.35.0-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.35.0-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.35.0-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.35.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Yaml" Version="1.35.0" />
+    <PackageReference Include="Microsoft.KernelMemory.AI.Ollama" Version="0.97.250211.1" />
+    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.97.250211.1" />
+    <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.97.250211.1" />
+    <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Qdrant" Version="0.97.250211.1" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.6.0" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.37.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.37.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.InMemory" Version="1.37.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Postgres" Version="1.37.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.37.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.37.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.37.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Yaml" Version="1.37.0" />
     <PackageReference Include="SmartComponents.LocalEmbeddings.SemanticKernel" Version="0.1.0-preview10148" />
   </ItemGroup>
 

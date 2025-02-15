@@ -1,26 +1,19 @@
 ﻿using Microsoft.Win32;
+using Notepad.GenAI;
 using Notepad.Helper;
 using Notepad.Properties;
 using Notepad.Windows;
-using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Notepad
@@ -28,8 +21,32 @@ namespace Notepad
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        CancellationTokenSource source = new CancellationTokenSource();
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private string _selectedModel = "llama3.2";
+
+        public ObservableCollection<string> Models { get; } = new()
+        {
+            "deepscaler",
+            "deepseek-r1:1.5b",
+            "llama3.2",
+            "qwen2.5:3b"
+        }; 
+        public string SelectedModel
+        {
+            get => _selectedModel;
+            set
+            {
+                _selectedModel = value;
+                if (null != value && null != this.PropertyChanged)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs(nameof(SelectedModel)));
+            }
+        }
+
         /// <summary>
         /// Gets or sets the content data of the current document.
         /// </summary>
@@ -89,6 +106,9 @@ namespace Notepad
         {
             // Initialize the main window components.
             InitializeComponent();
+
+            DataContext = this; // Ensure binding works
+            SelectedModel = Models[2]; // Set initial value (llama3.2)
 
             // Ensure the required font is installed.
             FontHelper.InstallFontIfNotInstalled("Segoe Fluent Icons", "Notepad.Resources.Segoe Fluent Icons.ttf");
@@ -497,6 +517,81 @@ namespace Notepad
 
             // Construct the Bing search URL with the selected text as the query, and Open the Microsoft Edge web browser to perform the Bing search.
             Process.Start($"microsoft-edge:https://www.bing.com/search?q={Uri.EscapeDataString(TextArea.SelectedText)}");
+        }
+
+        private void MakeItProfessional_CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+            e.CanExecute = TextArea.SelectedText.Length > 0;
+
+        private void PassToLanguageModel_CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+            e.CanExecute = TextArea.Text.Length > 0 || TextArea.SelectedText.Length > 0;
+
+        private async void MakeItProfessional_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var urlOllama = "http://localhost:11434";
+            var sb = new StringBuilder();
+            var ollama = new OllamaGateway(urlOllama);
+
+            var selectedModel = this.SelectedModel;
+            var capturedText = TextArea.SelectedText;
+
+            if (capturedText is not null)
+            {
+                this.ButtonStop.IsEnabled = true;
+                try
+                {
+                    await foreach (var text in ollama.MakeItProfessional(selectedModel, capturedText, this.source.Token))
+                    {
+                        if (!string.IsNullOrEmpty(text)) sb.Append(text);
+                        this.TextArea.SelectedText = sb.ToString();
+                    }
+                }
+                catch { }
+                this.ButtonStop.IsEnabled = false;
+            }
+        }
+
+        private async void PassToLanguageModel_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var urlOllama = "http://localhost:11434";
+            var sb = new StringBuilder();
+            var ollama = new OllamaGateway(urlOllama);
+
+            string capturedText = null;
+            var selectedModel = this.SelectedModel;
+
+            if (TextArea.SelectedText.Length > 0)
+                capturedText = TextArea.SelectedText;
+            else
+            {
+                capturedText = TextArea.Text;
+                sb.Append(capturedText);
+                sb.Append(Environment.NewLine);
+            }
+
+            if (capturedText is not null)
+            {
+                this.ButtonStop.IsEnabled = true;
+                try
+                {
+                    await foreach (var text in ollama.PassToLanguageModel(selectedModel, capturedText, this.source.Token))
+                    {
+                        if (!string.IsNullOrEmpty(text)) sb.Append(text);
+
+                        if (TextArea.SelectedText.Length > 0)
+                            this.TextArea.SelectedText = sb.ToString();
+                        else
+                            this.TextArea.Text = sb.ToString();
+                    }
+                }
+                catch { }
+                this.ButtonStop.IsEnabled = false;
+            }
+        }
+
+        private void ButtonStop_Click(object sender, RoutedEventArgs e)
+        {
+            this.source.Cancel();
+            this.source = new CancellationTokenSource();
         }
 
         /// <summary>
@@ -1470,6 +1565,5 @@ namespace Notepad
         }
 
         #endregion
-
     }
 }
