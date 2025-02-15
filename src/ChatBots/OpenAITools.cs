@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace ChatBots;
 
-internal static class OpenAITools
+static class OpenAITools
 {
     //https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/openai/Azure.AI.OpenAI/tests/Samples/01_Chat.cs
 

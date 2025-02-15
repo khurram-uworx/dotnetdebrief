@@ -13,13 +13,15 @@ using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.SemanticKernel;
 using Npgsql;
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ChatBots;
 
-internal class KernelMemoryPgRagSK
+class KernelMemoryPgRagSK
 {
-    private static async Task CreateDatabase(string connectionString, string databaseName)
+    static async Task CreateDatabase(string connectionString, string databaseName)
     {
         using var connection = new NpgsqlConnection(connectionString);
         using var command = new NpgsqlCommand();
@@ -38,7 +40,7 @@ internal class KernelMemoryPgRagSK
         connection.Close();
     }
 
-    private static async Task ConfigureVectors(string connectionString)
+    static async Task ConfigureVectors(string connectionString)
     {
         using var connection = new NpgsqlConnection(connectionString);
         using var command = new NpgsqlCommand();
@@ -51,7 +53,8 @@ internal class KernelMemoryPgRagSK
         connection.Close();
     }
 
-    public static async Task ClinicScenarioAsync(string urlOllama, string textModel, string embeddingModelName, string initialConnectionString, string connectionString, string databaseName)
+    public static async Task ClinicScenarioAsync(string urlOllama, string textModel, string embeddingModelName,
+        string initialConnectionString, string connectionString, string databaseName)
     {
         await CreateDatabase(initialConnectionString, databaseName);
         await ConfigureVectors(connectionString);
@@ -75,7 +78,7 @@ internal class KernelMemoryPgRagSK
                 l.SetMinimumLevel(LogLevel.Warning);
                 l.AddSimpleConsole(c => c.SingleLine = true);
             }))
-            .WithSimpleFileStorage(new SimpleFileStorageConfig { StorageType = FileSystemTypes.Disk }) // local file storage
+            .WithSimpleFileStorage(new SimpleFileStorageConfig { StorageType = FileSystemTypes.Disk, Directory = "MemoryClinic" }) // local file storage
             .WithPostgresMemoryDb(connectionString)
             .Build<MemoryServerless>();
 
@@ -102,5 +105,69 @@ internal class KernelMemoryPgRagSK
 
         Console.WriteLine("# Starting chat...");
         await kernel.ChatLoop(memory, systemPrompt, isStreaming: false, settings);
+    }
+
+    public static async Task ResumesScenarioAsync(string urlOllama, string textModel, string embeddingModelName,
+        string resumePath,
+        string initialConnectionString, string connectionString, string databaseName)
+    {
+        await CreateDatabase(initialConnectionString, databaseName);
+        await ConfigureVectors(connectionString);
+
+        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel,
+            (b, c) => b.Services.AddPostgresVectorStore(connectionString));
+
+        var config = new OllamaConfig
+        {
+            Endpoint = urlOllama,
+            TextModel = new OllamaModelConfig(textModel, maxToken: 131072),
+            EmbeddingModel = new OllamaModelConfig(embeddingModelName, maxToken: 2048)
+        };
+
+        IKernelMemory memory = new KernelMemoryBuilder()
+            .WithOllamaTextGeneration(config, new GPT4oTokenizer())
+            .WithOllamaTextEmbeddingGeneration(config, new GPT4oTokenizer())
+            .Configure(builder => builder.Services.AddLogging(l =>
+            {
+                l.SetMinimumLevel(LogLevel.Warning);
+                l.AddSimpleConsole(c => c.SingleLine = true);
+            }))
+            .WithSimpleFileStorage(new SimpleFileStorageConfig { StorageType = FileSystemTypes.Disk, Directory = "MemoryResumes" }) // local file storage
+            .WithPostgresMemoryDb(connectionString)
+            .Build<MemoryServerless>();
+
+        Console.WriteLine("# Memorizing pdfs...");
+        int total = 0, successful = 0;
+
+        foreach (var file in Directory.GetFiles(resumePath).Select(f => new FileInfo(f)))
+        {
+            total++;
+            try
+            {
+                string cleanedId = new string(file.Name.Where(char.IsLetter).ToArray());
+                string documentId = await memory.ImportDocumentAsync(file.FullName, cleanedId);
+                successful++;
+                Console.WriteLine($"{file.Name} processed, {successful}/{total} done");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to process {file.Name}");
+                Console.WriteLine(ex);
+            }
+        }
+
+        var systemPrompt = """
+            You are an AI assistant that answers questions using documents stored in the connected memory/vector store.
+            Guidelines:
+            - When providing an answer based on retrieved documents, always include a reference to the document ID.
+            - Keep responses clear and concise.
+            - If necessary, call additional tools/functions to improve the accuracy or completeness of your answer.
+
+            Question: {{$input}}
+            Answer: (Provide response using retrieved data, ensuring document ID references.)
+            """;
+
+        Console.WriteLine("# Starting chat...");
+        await kernel.ChatLoop(memory, systemPrompt, isStreaming: false);
     }
 }

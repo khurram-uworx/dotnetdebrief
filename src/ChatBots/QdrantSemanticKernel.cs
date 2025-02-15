@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-internal class QdrantSemanticKernel
+static class QdrantSemanticKernel
 {
     class OllamaTextEmbeddingService : ITextEmbeddingGenerationService
     {

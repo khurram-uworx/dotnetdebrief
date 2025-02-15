@@ -13,9 +13,9 @@ namespace ChatBots;
 
 //https://devblogs.microsoft.com/dotnet/introducing-microsoft-extensions-ai-preview/
 
-internal class Qdrant
+static class Qdrant
 {
-    internal static async Task<IVectorStoreRecordCollection<ulong, Movie>> CreateMovieCollectionAsync(
+    public static async Task<IVectorStoreRecordCollection<ulong, Movie>> CreateMovieCollectionAsync(
         IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
         IVectorStore vectorStore, string collectionName)
     {
