@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-internal class KernelMemoryQdrantRag
+class KernelMemoryQdrantRag
 {
     public static async Task RagWikipediaScenarioAsync(string urlOllama, string textModel, string embeddingModelName, string urlQdrant)
     {

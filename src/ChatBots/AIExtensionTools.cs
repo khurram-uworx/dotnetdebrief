@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-internal static class AIExtensionTools
+static class AIExtensionTools
 {
     class UmbrellaNeedResult
     {
@@ -76,7 +76,8 @@ internal static class AIExtensionTools
         //    foreach (var lang in response.Result.languages)
         //        Console.WriteLine(lang);
 
-        var response = await chatClient.CompleteAsync<UmbrellaNeedResult>("Do I need an umbrella? When replying what you get from tool include this as wather field",
+        var response = await chatClient.CompleteAsync<UmbrellaNeedResult>(
+            "Do I need an umbrella? When replying include weather field populating it with raw value what you get from the tool",
             options: new ChatOptions
             {
                 Tools = [AIFunctionFactory.Create(GetWeather)]

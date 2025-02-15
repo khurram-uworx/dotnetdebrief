@@ -4,7 +4,7 @@ using System.IO;
 
 namespace ChatBots;
 
-internal static class ML
+static class ML
 {
     public static void MLTest(string textModel)
     {
@@ -31,13 +31,16 @@ internal static class ML
 
             using GeneratorParams generatorParams = new GeneratorParams(model);
             generatorParams.SetSearchOption("max_length", 200);
-            generatorParams.SetInputSequences(sequences);
+            //generatorParams.SetInputSequences(sequences);
 
             Console.Out.Write("\nAI: ");
+            
             using Generator generator = new(model, generatorParams);
+            generator.AppendTokenSequences(sequences);
+
             while (!generator.IsDone())
             {
-                generator.ComputeLogits();
+                //generator.ComputeLogits(); // looks like we dont need this anymore
                 generator.GenerateNextToken();
                 Console.Out.Write(tokenizerStream.Decode(generator.GetSequence(0)[^1]));
                 Console.Out.Flush();

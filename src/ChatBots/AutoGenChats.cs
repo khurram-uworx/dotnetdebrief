@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-internal static class AutoGenChats
+static class AutoGenChats
 {
     public static async Task HelloWorldGptAsync()
     {

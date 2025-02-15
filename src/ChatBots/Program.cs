@@ -4,32 +4,32 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-internal static class Program
+static class Program
 {
     static async Task Main(string[] args)
     {
         var urlOllama = "http://localhost:11434";
         /*
-         * all-minilm all-MiniLM-L6-v2
-         *      Best for lightweight, fast, and general-purpose use cases where resource efficiency is critical
-         * nomic-embed-text / nomic-embed-large
-         *      A balanced choice for general-purpose tasks with a focus on transparency and ethical AI
-         * mxbai-embed-text / mxbai-embed-large
-         *      Ideal for high-performance, multilingual, and complex tasks where accuracy and richness of
-         *      embeddings are prioritized over speed and resource usage
-         */
+            * all-minilm all-MiniLM-L6-v2
+            *      Best for lightweight, fast, and general-purpose use cases where resource efficiency is critical
+            * nomic-embed-text / nomic-embed-large
+            *      A balanced choice for general-purpose tasks with a focus on transparency and ethical AI
+            * mxbai-embed-text / mxbai-embed-large
+            *      Ideal for high-performance, multilingual, and complex tasks where accuracy and richness of
+            *      embeddings are prioritized over speed and resource usage
+            */
         var embeddingModelName = "all-minilm";
         /*
-         * phi3/phi3:mini/phi3:latest
-         * llama2 and phi3 dont support tools
-         *      calebfahlgren/natural-functions
-         * mistral
-         */
-        var textModel = "llama3.2";
+            * phi3/phi3:mini/phi3:latest
+            * llama2 and phi3 dont support tools
+            *      calebfahlgren/natural-functions
+            * mistral, llama3.2
+            */
+        var textModel = "qwen2.5:3b";
 
         var options = new Dictionary<int, Action>();
         Console.WriteLine("Ensure your Ollama is up; choose your chat bot");
-        
+
         Console.WriteLine("[1] OpenAI Library Chat Completion");
         options.Add(1, () => OpenAI.Run(urlOllama, textModel));
 
@@ -57,8 +57,22 @@ internal static class Program
         Console.WriteLine("[21] AI Extensions Chat Completition and Tool");
         options.Add(21, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
 
-        Console.WriteLine("[31] SK Agents - Philophers");
-        options.Add(31, () => new AgentDebate().DebateAsync(urlOllama, textModel, "How can we ensure that AI benefits all of humanity?").Wait());
+        Console.WriteLine("[31] SK Agents - Ticket Handler");
+        options.Add(31, () =>
+        {
+            var ticket = """
+        Internet connection is very slow, I think its the Saturday's rain, something has gone wrong since then.
+        It takes lot of time to download things, sometimes page is not completely loaded. My office operations
+        are suffering because of this. Please do needful as soon as possible.
+                
+        I am your premium customer and my service/connection id is khurram-uworx
+    """;
+            new AgentTicketHandler(urlOllama, textModel).HandleTicketAsync(ticket).Wait();
+        });
+        Console.WriteLine("[32] SK Agents - Philophers");
+        options.Add(32, () => new AgentDebate(urlOllama, textModel).DebateAsync("How can we ensure that AI benefits all of humanity?").Wait());
+        Console.WriteLine("[33*] SK Agents - Creative Writer; not completed / working");
+        options.Add(33, () => new AgentCreativeWriter(urlOllama, textModel).WriteCreativelyAsync("How can we ensure that AI benefits all of humanity?").Wait());
 
         Console.WriteLine();
         Console.WriteLine("Run Qdrant first; docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant");
@@ -79,14 +93,24 @@ internal static class Program
         options.Add(46, () => KernelMemoryQdrantRagSK.RagDocumentsScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant, hostQdrant).Wait());
 
         Console.WriteLine();
-        Console.WriteLine("Run pgvector first; docker run -e POSTGRES_PASSWORD=uworx -p 5432:5432 -d pgvector/pgvector:pg17");
+        Console.WriteLine("Run pgvector first; docker run -e POSTGRES_PASSWORD=uworx -p 5432:5432 pgvector/pgvector:pg17");
         var initialConnectionString = "Server=127.0.0.1;Port=5432;Database=postgres;User Id=postgres;Password=uworx;";
-        var connectionString = "Server=127.0.0.1;Port=5432;Database=rag;User Id=postgres;Password=uworx;";
-        var databaseName = "rag";
 
         Console.WriteLine("[51] Kernel Memory with PostgreSQL and RAG Scenario - Clinic using Semantic Kernel");
         options.Add(51, () => KernelMemoryPgRagSK.ClinicScenarioAsync(urlOllama, textModel, embeddingModelName,
-            initialConnectionString, connectionString, databaseName).Wait());
+            initialConnectionString,
+            connectionString: "Server=127.0.0.1;Port=5432;Database=ragClinic;User Id=postgres;Password=uworx;",
+            databaseName: "ragClinic").Wait());
+        Console.WriteLine("[52] Kernel Memory with PostgreSQL and RAG Scenario - Resumes");
+        options.Add(52, () =>
+        {
+            Console.Write("Enter the path where resume files exist\t");
+            string resumePath = Console.ReadLine();
+            KernelMemoryPgRagSK.ResumesScenarioAsync(urlOllama, textModel, embeddingModelName,
+                resumePath, initialConnectionString,
+                connectionString: "Server=127.0.0.1;Port=5432;Database=ragResumes;User Id=postgres;Password=uworx;",
+                databaseName: "ragResumes").Wait();
+        });
 
         Console.WriteLine();
         int option;

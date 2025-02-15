@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VectorDatabases.Data;
 
-internal class User
+class User
 {
     [Key]
     public int UserId { get; set; }
@@ -14,7 +14,7 @@ internal class User
     public virtual ICollection<Rating> Ratings { get; set; }
 }
 
-internal class Movie
+class Movie
 {
     [Key]
     public int MovieId { get; set; }
@@ -23,7 +23,7 @@ internal class Movie
     public virtual ICollection<Rating> Ratings { get; set; }
 }
 
-internal class Rating
+class Rating
 {
     [Key]
     public int RatingId { get; set; }
@@ -36,7 +36,7 @@ internal class Rating
     public virtual Movie Movie { get; set; }
 }
 
-internal class MovieContext : DbContext
+class MovieContext : DbContext
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Movie> Movies { get; set; }

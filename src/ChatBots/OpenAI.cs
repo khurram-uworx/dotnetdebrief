@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace ChatBots;
 
-internal static class OpenAI
+static class OpenAI
 {
     public static void Run(string urlOllama, string textModel)
     {

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-internal static class SemanticKernelChats
+static class SemanticKernelChats
 {
     public static async Task HelloWorldAsync(string urlOllama, string textModel)
     {

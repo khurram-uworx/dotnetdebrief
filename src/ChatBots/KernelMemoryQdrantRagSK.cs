@@ -17,9 +17,9 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-internal class KernelMemoryQdrantRagSK
+class KernelMemoryQdrantRagSK
 {
-    private static async Task MemorizeDocumentsAsync(IKernelMemory memory, List<string> pages)
+    static async Task MemorizeDocumentsAsync(IKernelMemory memory, List<string> pages)
     {
         Func<string, string> GetUrlId = url => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(url))).ToUpperInvariant();
 

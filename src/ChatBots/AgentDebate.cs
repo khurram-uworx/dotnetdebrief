@@ -7,7 +7,10 @@ using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.Chat;
 using Microsoft.SemanticKernel.ChatCompletion;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChatBots;
@@ -20,81 +23,130 @@ class AgentDebate
     const string SocratesName = "Socrates";
     const string PlatoName = "Plato";
     const string AristotleName = "Aristotle";
+    Kernel kernel = null;
 
-    public async Task DebateAsync(string urlOllama, string textModel, string prompt)
+    class AgentDebateSelectionStrategy : SelectionStrategy
+    {
+        Agent socrates, aristotle, plato;
+
+        public AgentDebateSelectionStrategy(Agent socrates, Agent aristotle, Agent plato) =>
+            (this.socrates, this.aristotle, this.plato) = (socrates, aristotle, plato);
+
+        protected override Task<Agent> SelectAgentAsync(IReadOnlyList<Agent> agents, IReadOnlyList<ChatMessageContent> history, CancellationToken cancellationToken = default)
+        {
+            if (history.Count <= 1)
+                return Task.FromResult(socrates);
+            else
+            {
+                var lastChat = history.Last();
+
+                if (lastChat.Content is not null && lastChat.Content.ToString().Trim() == string.Empty)
+                {
+                    if (lastChat.AuthorName == socrates.Name)
+                        return Task.FromResult(socrates);
+                    else if (lastChat.AuthorName == plato.Name)
+                        return Task.FromResult(plato);
+                    else if (lastChat.AuthorName == aristotle.Name)
+                        return Task.FromResult(aristotle);
+                }
+
+                if (lastChat.AuthorName == socrates.Name)
+                    return Task.FromResult(plato);
+                else if (lastChat.AuthorName == plato.Name)
+                    return Task.FromResult(aristotle);
+                else if (lastChat.AuthorName == aristotle.Name)
+                    return Task.FromResult(socrates);
+
+                return Task.FromResult(socrates);
+            }
+        }
+    }
+
+    public AgentDebate(string urlOllama, string textModel)
+    {
+        this.kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
+    }
+
+    public async Task DebateAsync(string prompt)
     {
         Console.WriteLine(prompt);
-
-        var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel,
-            (b, c) =>
-            {
-            });
 
         Func<string, ChatCompletionAgent> agentSetup = file =>
         {
             var agentPrompt = File.ReadAllText(file);
             var prompt = KernelFunctionYaml.ToPromptTemplateConfig(agentPrompt);
-            return new ChatCompletionAgent(prompt) { Kernel = kernel };
+            return new ChatCompletionAgent(prompt) { Kernel = this.kernel };
         };
 
-        var socrates = agentSetup("PromptTemplates/SocratesAgent.yaml");
-        var aristotle = agentSetup("PromptTemplates/AristotleAgent.yaml");
-        var plato = agentSetup("PromptTemplates/PlatoAgent.yaml");
+        // https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-templates
+        // https://learn.microsoft.com/en-us/semantic-kernel/concepts/prompts/yaml-schema
+
+        var socrates = agentSetup("DebateAgents/SocratesAgent.yaml");
+        var aristotle = agentSetup("DebateAgents/AristotleAgent.yaml");
+        var plato = agentSetup("DebateAgents/PlatoAgent.yaml");
 
         try
         {
             var terminateFunction = KernelFunctionFactory.CreateFromPrompt(
+                // if we dont provide history ai will not be able to determine due to no context
                 $$$"""
-                    History:
+                    Your job is to determine if discussion is completed.
+
+                    Here's the history of the discussion so far
                     {{$history}}
                     
-                    VERY VERY Important: Make sure every participant gets a chance to speak; these are the participants
+                    You will decide using two things; first make sure every participant gets a chance to speak; these are the participants
                     - {{{SocratesName}}}
                     - {{{PlatoName}}}
                     - {{{AristotleName}}}
+                    and second assess if all the questions or concerns of {{{SocratesName}}} are addressed or {{{SocratesName}}} has nothing else to say
+                    or {{{SocratesName}}} is looking satisfied with the debate
+
+                    Important: only give yes or no answer; dont describe anything else. Say yes if discussion is completed and all have participated; otherwise say no
                     """
                 );
             var selectionFunction = KernelFunctionFactory.CreateFromPrompt(
                 $$$"""
-                    History:
-                    {{$history}}
+                    Your job is to determine which participant takes the next turn in the debate.
 
-                    Your job is to determine which participant takes the next turn in a conversation according to the action of the most recent participant.
-                    State only the name of the participant to take the next turn.
-
-                    Always follow these steps when selecting the next participant:
-                    1) After user input, it is {{{SocratesName}}}'s turn to respond.
-                    2) After {{{SocratesName}}} replies, it's {{{PlatoName}}}'s turn based on {{{SocratesName}}}'s response.
-                    3) After {{{PlatoName}}} replies, it's {{{AristotleName}}}'s turn based on {{{SocratesName}}}'s response.
-                    4) After {{{AristotleName}}} replies, it's {{{SocratesName}}}'s turn to summarize the responses and end the conversation.
-
-                    Make sure each participant has a turn
-
-                    VERY VERY Important: Choose only from these participants and in your reply; only state their name; dont describe anything else:
+                    Choose only from these participants
                     - {{{SocratesName}}}
                     - {{{PlatoName}}}
                     - {{{AristotleName}}}
+                    
+                    Always follow these steps when selecting the next participant:
+                    - After user it is always {{{SocratesName}}} turn
+                    - After {{{SocratesName}}} replies, its {{{PlatoName}}} turn
+                    - After {{{PlatoName}}} replies, it's {{{AristotleName}}} turn
+                    - After {{{AristotleName}}} replies, its {{{SocratesName}}} turn
+                                        
+                    Here's the history of the discussion so far
+                    {{$history}}
+                                                            
+                    VERY Important: In your reply; only state their name; dont describe anything else and DO NOT select the participant again who has just responded
+                    and is the last in the history above
                     """
             );
             var chat = new AgentGroupChat(socrates, aristotle, plato)
             {
                 ExecutionSettings = new()
                 {
-                    TerminationStrategy = new KernelFunctionTerminationStrategy(terminateFunction, kernel)
+                    TerminationStrategy = new KernelFunctionTerminationStrategy(terminateFunction, this.kernel)
                     {
                         Agents = [socrates],
                         ResultParser = (result) =>
                             result.GetValue<string>()?.Contains("yes", StringComparison.OrdinalIgnoreCase) ?? false,
                         HistoryVariableName = "history",
-                        MaximumIterations = 4
+                        //MaximumIterations = 10
                     },
-                    SelectionStrategy = new KernelFunctionSelectionStrategy(selectionFunction, kernel)
-                    {
-                        AgentsVariableName = "agents",
-                        HistoryVariableName = "history",
-                        ResultParser = result =>
-                            (result.GetValue<string>() ?? "").Trim().TrimEnd('.')
-                    }
+                    //SelectionStrategy = new KernelFunctionSelectionStrategy(selectionFunction, kernel)
+                    //{
+                    //    AgentsVariableName = "agents",
+                    //    HistoryVariableName = "history",
+                    //    ResultParser = result =>
+                    //        (result.GetValue<string>() ?? "").Trim().TrimEnd('.')
+                    //}
+                    SelectionStrategy = new AgentDebateSelectionStrategy(socrates, aristotle, plato)
                 }
             };
 

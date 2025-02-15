@@ -9,7 +9,7 @@
         ResizeMode="CanResizeWithGrip" Closing="Window_Closing" SourceInitialized="Window_SourceInitialized"
         >
     <Window.CommandBindings>
-        
+
         <!-- Built-in WPF Commands -->
         <CommandBinding x:Name="New" Command="ApplicationCommands.New" Executed="New_Executed"/>
         <CommandBinding x:Name="Open" Command="ApplicationCommands.Open" Executed="Open_Executed"/>
@@ -25,6 +25,8 @@
         <CommandBinding x:Name="NewWindow" Command="local:CustomNotepadCommands.NewWindow" Executed="NewWindow_Executed"/>
         <CommandBinding x:Name="SaveAs" Command="local:CustomNotepadCommands.SaveAs" Executed="SaveAs_Executed"/>
         <CommandBinding x:Name="SearchWithBing" Command="local:CustomNotepadCommands.SearchWithBing" CanExecute="SearchWithBing_CanExecute" Executed="SearchWithBing_Executed"/>
+        <CommandBinding x:Name="MakeItProfessional" Command="local:CustomNotepadCommands.MakeItProfessional" CanExecute="MakeItProfessional_CanExecute" Executed="MakeItProfessional_Executed"/>
+        <CommandBinding x:Name="PassToLanguageModel" Command="local:CustomNotepadCommands.PassToLanguageModel" CanExecute="PassToLanguageModel_CanExecute" Executed="PassToLanguageModel_Executed"/>
         <CommandBinding x:Name="FindNext" Command="local:CustomNotepadCommands.FindNext" CanExecute="Find_CanExecute" Executed="FindNext_Executed"/>
         <CommandBinding x:Name="FindPrevious" Command="local:CustomNotepadCommands.FindPrevious" CanExecute="Find_CanExecute" Executed="FindPrevious_Executed"/>
         <CommandBinding x:Name="GoTo" Command="local:CustomNotepadCommands.GoTo" Executed="GoTo_Executed"/>
@@ -49,7 +51,7 @@
         <Canvas Grid.Row="0" x:Name="HideCanvas" Height="1" Background="{Binding ElementName=Menubar, Path=Background}" MouseEnter="Window_MouseEnter" MouseLeave="Window_MouseLeave"></Canvas>
         <!-- Menu bar at the top -->
         <Menu Style="{DynamicResource MenuBarStyle}" Name="Menubar" Grid.Row="0" MouseEnter="Window_MouseEnter" MouseLeave="Window_MouseLeave">
-            
+
             <!-- File menu -->
             <MenuItem Header="_File">
                 <!-- New File -->
@@ -165,6 +167,17 @@
                         <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16"></TextBlock>
                     </MenuItem.Icon>
                 </MenuItem>
+                <Separator/>
+                <MenuItem Header="_Make it professional..." Command="local:CustomNotepadCommands.MakeItProfessional">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16"></TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Pass to model..." Command="local:CustomNotepadCommands.PassToLanguageModel">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16"></TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <!-- Find -->
                 <MenuItem Header="_Find" Command="ApplicationCommands.Find">
                     <MenuItem.Icon>
@@ -272,9 +285,9 @@
                         <TextBlock Text="&#xed1a;" FontFamily="Segoe Fluent Icons" FontSize="16"></TextBlock>
                     </MenuItem.Icon>
                 </MenuItem>
-                
+
                 <!--Adding Additional Fetures-->
-                
+
                 <Separator></Separator>
                 <!--Hide Both ScrollBars (Vertical and Horizontal)-->
                 <MenuItem Header="Hide Scrollbars" Name="HideScrollbars" IsCheckable="True" Checked="HideScrollbars_Checked" Unchecked="HideScrollbars_Unchecked">
@@ -436,6 +449,17 @@
                             <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16" ></TextBlock>
                         </MenuItem.Icon>
                     </MenuItem>
+                    <Separator></Separator>
+                    <MenuItem Header="_Make it professional..." Command="local:CustomNotepadCommands.MakeItProfessional" InputGestureText=" ">
+                        <MenuItem.Icon>
+                            <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16" ></TextBlock>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Pass to model..." Command="local:CustomNotepadCommands.PassToLanguageModel" InputGestureText=" ">
+                        <MenuItem.Icon>
+                            <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16" ></TextBlock>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
             </TextBox.ContextMenu>
         </TextBox>
@@ -497,15 +521,27 @@
             <!-- Status bar item for displaying line-ending type -->
             <StatusBarItem Grid.Column="6"
                            HorizontalAlignment="Right"
-                           Width="130">Windows (CRLF)</StatusBarItem>
-
+                           Width="130">
+                <ComboBox Width="140"
+                        ItemsSource="{Binding Models}"
+                        SelectedItem="{Binding SelectedModel, Mode=TwoWay}" >
+                </ComboBox>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="7">
+                <Button Name="ButtonStop" IsEnabled="False" Click="ButtonStop_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE71A;" FontFamily="Segoe Fluent Icons" FontSize="20" />
+                        <TextBlock Text=" Stop" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+            </StatusBarItem>
             <!-- Separator -->
-            <Separator Grid.Column="7" 
+            <Separator Grid.Column="8" 
                        HorizontalAlignment="Right" 
                        Background="LightGray"></Separator>
 
             <!-- Status bar item for displaying text encoding -->
-            <StatusBarItem Grid.Column="8"
+            <StatusBarItem Grid.Column="9"
                            HorizontalAlignment="Right"
                            Width="100">UTF-8</StatusBarItem>
         </StatusBar>
