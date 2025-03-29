@@ -102,10 +102,10 @@ static class Qdrant
         var query = "A family friendly movie";
         var queryEmbedding = await embeddingGenerator.GenerateEmbeddingVectorAsync(query);
 
-        var searchOptions = new VectorSearchOptions()
+        var searchOptions = new VectorSearchOptions<Movie>()
         {
-            Top = 1,
-            VectorPropertyName = "Vector"
+            Top = 1
+            //VectorPropertyName = "Vector"
         };
 
         var results = await movies.VectorizedSearchAsync(queryEmbedding, searchOptions);

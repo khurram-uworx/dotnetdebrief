@@ -18,6 +18,13 @@ namespace ChatBots;
 
 class AgentTicketHandler
 {
+    //https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-chat
+    
+    //https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/GettingStartedWithAgents/Step02_Plugins.cs
+
+    //Updates : https://devblogs.microsoft.com/semantic-kernel/semantic-kernel-agent-framework-rc2/
+    //          https://devblogs.microsoft.com/semantic-kernel/release-the-agents-sk-agents-framework-rc1/
+
     class TicketHandlerTerminationStrategy : TerminationStrategy
     {
         protected override Task<bool> ShouldAgentTerminateAsync(Agent agent, IReadOnlyList<ChatMessageContent> history, CancellationToken cancellationToken)
@@ -71,9 +78,9 @@ class AgentTicketHandler
             var prompt = KernelFunctionYaml.ToPromptTemplateConfig(agentPrompt);
 
             if (arguments != null)
-                return new ChatCompletionAgent(prompt) { Kernel = k, Arguments = arguments };
+                return new ChatCompletionAgent(prompt, new KernelPromptTemplateFactory()) { Kernel = k, Arguments = arguments };
             else
-                return new ChatCompletionAgent(prompt) { Kernel = k };
+                return new ChatCompletionAgent(prompt, new KernelPromptTemplateFactory()) { Kernel = k };
         };
         Func<Kernel, string, ChatCompletionAgent> agentSetup = (k, file) =>
             agentArgumentSetup(k, file, null);

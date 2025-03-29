@@ -61,12 +61,12 @@ static class Program
         options.Add(31, () =>
         {
             var ticket = """
-        Internet connection is very slow, I think its the Saturday's rain, something has gone wrong since then.
-        It takes lot of time to download things, sometimes page is not completely loaded. My office operations
-        are suffering because of this. Please do needful as soon as possible.
+                Internet connection is very slow, I think its the Saturday's rain, something has gone wrong since then.
+                It takes lot of time to download things, sometimes page is not completely loaded. My office operations
+                are suffering because of this. Please do needful as soon as possible.
                 
-        I am your premium customer and my service/connection id is khurram-uworx
-    """;
+                I am your premium customer and my service/connection id is khurram-uworx
+            """;
             new AgentTicketHandler(urlOllama, textModel).HandleTicketAsync(ticket).Wait();
         });
         Console.WriteLine("[32] SK Agents - Philophers");

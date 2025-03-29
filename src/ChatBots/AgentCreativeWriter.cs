@@ -18,9 +18,9 @@ class AgentCreativeWriter
 {
     //https://github.com/Azure-Samples/aspire-semantic-kernel-creative-writer
 
-    const string ResearcherName = "Researcher";
-    const string MarketingName = "Marketing";
-    const string WriterName = "Writer";
+    //const string ResearcherName = "Researcher";
+    //const string MarketingName = "Marketing";
+    //const string WriterName = "Writer";
     const string EditorName = "Editor";
 
     class NoFeedbackLeftTerminationStrategy : TerminationStrategy
@@ -50,7 +50,7 @@ class AgentCreativeWriter
         {
             var agentPrompt = File.ReadAllText(file);
             var prompt = KernelFunctionYaml.ToPromptTemplateConfig(agentPrompt);
-            return new ChatCompletionAgent(prompt) { Kernel = this.kernel };
+            return new ChatCompletionAgent(prompt, new KernelPromptTemplateFactory()) { Kernel = this.kernel };
         };
 
         var editor = agentSetup("WriterAgents/editor.yaml");

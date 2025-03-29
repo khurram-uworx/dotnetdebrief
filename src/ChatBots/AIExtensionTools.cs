@@ -76,7 +76,7 @@ static class AIExtensionTools
         //    foreach (var lang in response.Result.languages)
         //        Console.WriteLine(lang);
 
-        var response = await chatClient.CompleteAsync<UmbrellaNeedResult>(
+        var response = await chatClient.GetResponseAsync<UmbrellaNeedResult>(
             "Do I need an umbrella? When replying include weather field populating it with raw value what you get from the tool",
             options: new ChatOptions
             {

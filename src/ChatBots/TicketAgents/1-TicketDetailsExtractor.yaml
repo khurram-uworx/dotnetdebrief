@@ -27,5 +27,3 @@ execution_settings:
   default:
     temperature: 0.2
     top_p: 0.0
-    function_choice_behavior:
-      type: none

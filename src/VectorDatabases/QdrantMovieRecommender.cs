@@ -199,7 +199,7 @@ class QdrantMovieRecommender
         {
             if (null != searchPoint && null != searchPoint.Vectors)
             {
-                var ratings = searchPoint.Vectors.Vectors_.Vectors.GetValueOrDefault("ratings");
+                var ratings = searchPoint.Vectors.Vectors.Vectors.GetValueOrDefault("ratings");
                 if (null != ratings)
                 {
                     int i = 0;

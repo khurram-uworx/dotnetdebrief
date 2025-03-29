@@ -1,14 +1,15 @@
 ﻿using VectorDatabases;
 
-//docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant
-var hostQdrant = "localhost";
-
 var q = new QdrantMovieRecommender(); // will create in memory database from ml-1m
 
 var list = await q.SearchMoviesByTitle("Redemption");
 foreach (var m in list)
     Console.WriteLine($"{m.MovieId}: {m.Title}");
 
+Console.WriteLine("Ensure qdran is running; docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant, press Enter to continue");
+Console.ReadLine();
+
+var hostQdrant = "localhost";
 await q.CreateCollection(hostQdrant, collectionName: "ml-1m");
 var recommendations = await q.GetRecommendations(hostQdrant, collectionName: "ml-1m",
     givenRatings: new Dictionary<uint, float> {

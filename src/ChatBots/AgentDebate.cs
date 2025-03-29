@@ -17,7 +17,6 @@ namespace ChatBots;
 
 class AgentDebate
 {
-    //https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-chat
     //https://github.com/microsoft/all-things-azure/blob/main/agentic-philosophers
     //const string PlatoFileName = "Plato.pdf";
     const string SocratesName = "Socrates";
@@ -75,7 +74,7 @@ class AgentDebate
         {
             var agentPrompt = File.ReadAllText(file);
             var prompt = KernelFunctionYaml.ToPromptTemplateConfig(agentPrompt);
-            return new ChatCompletionAgent(prompt) { Kernel = this.kernel };
+            return new ChatCompletionAgent(prompt, new KernelPromptTemplateFactory()) { Kernel = this.kernel };
         };
 
         // https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-templates
