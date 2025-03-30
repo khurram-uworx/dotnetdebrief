@@ -75,34 +75,39 @@ static class Program
         options.Add(33, () => new AgentCreativeWriter(urlOllama, textModel).WriteCreativelyAsync("How can we ensure that AI benefits all of humanity?").Wait());
 
         Console.WriteLine();
+        Console.WriteLine("[41] MCP: Github Repository");
+        options.Add(41, () => new McpRepository(urlOllama, textModel).HandleMcpPromptAsync(
+            "Summarize the last four commits to the microsoft/semantic-kernel repository?").Wait());
+
+        Console.WriteLine();
         Console.WriteLine("Run Qdrant first; docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant");
         var urlQdrant = "http://localhost:6333";
         var hostQdrant = "localhost";
 
-        Console.WriteLine("[41] Qdrant Quick Start, test_collection will be created/used");
-        options.Add(41, () => Qdrant.QuickStartAsync(hostQdrant, collectionName: "test_collection").Wait());
-        Console.WriteLine("[42] Qdrant with Vector Data Extensions, movies collection will be created/used");
-        options.Add(42, () => Qdrant.VectorDataExtensionsAsync(urlOllama, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
-        Console.WriteLine("[43] Qdrant RAG Scenario - Clinic");
-        options.Add(43, () => QdrantSemanticKernel.RagClinicScenarioAsync(urlOllama, textModel, urlQdrant, hostQdrant, collectionName: "clinicFacts").Wait());
-        Console.WriteLine("[44] Qdrant Semantic Search, movies collection will be created/used");
-        options.Add(44, () => QdrantSemanticKernel.SearchScenarioAsync(urlOllama, textModel, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
-        Console.WriteLine("[45] Qdrant as Semantic Kernel Memory; RAG for wikipedia");
-        options.Add(45, () => KernelMemoryQdrantRag.RagWikipediaScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant).Wait());
-        Console.WriteLine("[46] Qdrant as Semantic Kernel Memory; RAG for web pages (SK docs)");
-        options.Add(46, () => KernelMemoryQdrantRagSK.RagDocumentsScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant, hostQdrant).Wait());
+        Console.WriteLine("[51] Qdrant Quick Start, test_collection will be created/used");
+        options.Add(51, () => Qdrant.QuickStartAsync(hostQdrant, collectionName: "test_collection").Wait());
+        Console.WriteLine("[52] Qdrant with Vector Data Extensions, movies collection will be created/used");
+        options.Add(52, () => Qdrant.VectorDataExtensionsAsync(urlOllama, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
+        Console.WriteLine("[53] Qdrant RAG Scenario - Clinic");
+        options.Add(53, () => QdrantSemanticKernel.RagClinicScenarioAsync(urlOllama, textModel, urlQdrant, hostQdrant, collectionName: "clinicFacts").Wait());
+        Console.WriteLine("[54] Qdrant Semantic Search, movies collection will be created/used");
+        options.Add(54, () => QdrantSemanticKernel.SearchScenarioAsync(urlOllama, textModel, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
+        Console.WriteLine("[55] Qdrant as Semantic Kernel Memory; RAG for wikipedia");
+        options.Add(55, () => KernelMemoryQdrantRag.RagWikipediaScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant).Wait());
+        Console.WriteLine("[56] Qdrant as Semantic Kernel Memory; RAG for web pages (SK docs)");
+        options.Add(56, () => KernelMemoryQdrantRagSK.RagDocumentsScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant, hostQdrant).Wait());
 
         Console.WriteLine();
         Console.WriteLine("Run pgvector first; docker run -e POSTGRES_PASSWORD=uworx -p 5432:5432 pgvector/pgvector:pg17");
         var initialConnectionString = "Server=127.0.0.1;Port=5432;Database=postgres;User Id=postgres;Password=uworx;";
 
-        Console.WriteLine("[51] Kernel Memory with PostgreSQL and RAG Scenario - Clinic using Semantic Kernel");
-        options.Add(51, () => KernelMemoryPgRagSK.ClinicScenarioAsync(urlOllama, textModel, embeddingModelName,
+        Console.WriteLine("[61] Kernel Memory with PostgreSQL and RAG Scenario - Clinic using Semantic Kernel");
+        options.Add(61, () => KernelMemoryPgRagSK.ClinicScenarioAsync(urlOllama, textModel, embeddingModelName,
             initialConnectionString,
             connectionString: "Server=127.0.0.1;Port=5432;Database=ragClinic;User Id=postgres;Password=uworx;",
             databaseName: "ragClinic").Wait());
-        Console.WriteLine("[52] Kernel Memory with PostgreSQL and RAG Scenario - Resumes");
-        options.Add(52, () =>
+        Console.WriteLine("[62] Kernel Memory with PostgreSQL and RAG Scenario - Resumes");
+        options.Add(62, () =>
         {
             Console.Write("Enter the path where resume files exist\t");
             string resumePath = Console.ReadLine();
