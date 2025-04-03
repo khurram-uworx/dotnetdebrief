@@ -29,7 +29,7 @@ namespace Notepad.GenAI
                 """));
             chatMessages.Add(new ChatMessage(ChatRole.User, text));
 
-            await foreach (var update in chatClient.CompleteStreamingAsync(chatMessages, cancellationToken: token))
+            await foreach (var update in chatClient.GetStreamingResponseAsync(chatMessages, cancellationToken: token))
                 if (update.Text is not null) yield return update.Text;
         }
 
@@ -40,7 +40,7 @@ namespace Notepad.GenAI
                 .AsBuilder()
                 .Build();
 
-            await foreach (var update in chatClient.CompleteStreamingAsync(text, cancellationToken: token))
+            await foreach (var update in chatClient.GetStreamingResponseAsync(text, cancellationToken: token))
                 if (update.Text is not null) yield return update.Text;
         }
     }
