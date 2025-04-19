@@ -3,43 +3,42 @@ using System.ComponentModel;
 using System.Data.SqlClient;
 using System.Globalization;
 
-namespace UWorx.HR.Data.Helpers
+namespace UWorx.HR.Data.Helpers;
+
+internal static class SqlReaderHelper
 {
-    internal static class SqlReaderHelper
+    public static bool IsNullableType(Type valueType)
     {
-        public static bool IsNullableType(Type valueType)
+        return (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>));
+    }
+
+    public static T GetValue<T>(SqlDataReader reader, string columnName)
+    {
+        object value = reader[columnName];
+        Type valueType = typeof(T);
+
+        if (valueType == typeof(string) && !DBNull.Value.Equals(reader[columnName]))
         {
-            return (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Nullable<>));
+            if (!string.IsNullOrEmpty((string)value))
+            {
+                value = ((string)value).TrimEnd(' ');
+            }
         }
 
-        public static T GetValue<T>(SqlDataReader reader, string columnName)
+        if (DBNull.Value != value)
         {
-            object value = reader[columnName];
-            Type valueType = typeof(T);
-
-            if (valueType == typeof(string) && !DBNull.Value.Equals(reader[columnName]))
+            if (!IsNullableType(valueType))
             {
-                if (!string.IsNullOrEmpty((string)value))
-                {
-                    value = ((string)value).TrimEnd(' ');
-                }
+                return (T)Convert.ChangeType(value, valueType, CultureInfo.InvariantCulture);
             }
-
-            if (DBNull.Value != value)
+            else
             {
-                if (!IsNullableType(valueType))
-                {
-                    return (T)Convert.ChangeType(value, valueType, CultureInfo.InvariantCulture);
-                }
-                else
-                {
-                    NullableConverter theNullableConverter = new NullableConverter(valueType);
+                NullableConverter theNullableConverter = new NullableConverter(valueType);
 
-                    return (T)Convert.ChangeType(value, theNullableConverter.UnderlyingType, CultureInfo.InvariantCulture);
-                }
+                return (T)Convert.ChangeType(value, theNullableConverter.UnderlyingType, CultureInfo.InvariantCulture);
             }
-
-            return default(T);
         }
+
+        return default(T);
     }
 }

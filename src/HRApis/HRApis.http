@@ -1,0 +1,6 @@
+@HRApis_HostAddress = http://localhost:5016
+
+GET {{HRApis_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
