@@ -78,6 +78,9 @@ static class Program
         Console.WriteLine("[41] MCP: Github Repository");
         options.Add(41, () => new McpRepository(urlOllama, textModel).HandleMcpPromptAsync(
             "Summarize the last four commits to the microsoft/semantic-kernel repository?").Wait());
+        Console.WriteLine("[42] MCP: Playwright");
+        options.Add(42, () => new McpPlaywright(urlOllama, textModel).HandleMcpPromptAsync(
+            "Browse to https://uworx.webhr.co/jobs/home using the Playwright tool and then summarize currently opened jobs you find on that web page").Wait());
 
         Console.WriteLine();
         Console.WriteLine("Run Qdrant first; docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant");
