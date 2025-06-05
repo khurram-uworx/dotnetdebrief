@@ -24,8 +24,9 @@ static class Program
             * llama2 and phi3 dont support tools
             *      calebfahlgren/natural-functions
             * mistral, llama3.2
+            * andthattoo/tinyagent-1.1b doesnt support tool calling
             */
-        var textModel = "qwen2.5:3b";
+        var textModel = "qwen3:4b"; // "qwen2.5:3b";
 
         var options = new Dictionary<int, Action>();
         Console.WriteLine("Ensure your Ollama is up; choose your chat bot");
@@ -54,8 +55,12 @@ static class Program
         Console.WriteLine("[14] SK RAG Scenario");
         options.Add(14, () => SemanticKernelChats.RagScenarioAsync(urlOllama, textModel).Wait());
 
-        Console.WriteLine("[21] AI Extensions Chat Completition and Tool");
-        options.Add(21, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
+        Console.WriteLine("[21] AI Extensions Structured Output");
+        options.Add(21, () => AIExtensions.StructuredOutputAsync(urlOllama, textModel).Wait());
+        Console.WriteLine("[22] AI Extensions Function Calling");
+        options.Add(22, () => AIExtensions.FunctionCallingAsync(urlOllama, textModel).Wait());
+        //Console.WriteLine("[23] AI Extensions Chat Completition and Tool");
+        //options.Add(23, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
 
         Console.WriteLine("[31] SK Agents - Ticket Handler");
         options.Add(31, () =>
