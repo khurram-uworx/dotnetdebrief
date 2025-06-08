@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.AI;
+using OllamaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,10 @@ static class AIExtensions
     public static async Task StructuredOutputAsync(string urlOllama, string textModel)
     {
         //https://learn.microsoft.com/en-us/dotnet/ai/quickstarts/structured-output
-        IChatClient chatClient = new OllamaChatClient(new Uri(urlOllama), textModel)
-            .AsBuilder()
-            .UseFunctionInvocation()
-            .Build();
+        IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), textModel);
+            //.AsBuilder()
+            //.UseFunctionInvocation()
+            //.Build();
 
         string[] inputs = [
             "Best purchase ever!",
@@ -40,10 +41,10 @@ static class AIExtensions
     public static async Task FunctionCallingAsync(string urlOllama, string textModel)
     {
         //https://learn.microsoft.com/en-us/dotnet/ai/quickstarts/use-function-calling
-        IChatClient client = new OllamaChatClient(new Uri(urlOllama), textModel)
-            .AsBuilder()
-            .UseFunctionInvocation()
-            .Build();
+        IChatClient client = new OllamaApiClient(new Uri(urlOllama), textModel);
+            //.AsBuilder()
+            //.UseFunctionInvocation()
+            //.Build();
 
         var chatOptions = new ChatOptions
         {

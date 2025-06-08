@@ -3,6 +3,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Models;
+using OllamaSharp;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
 using System;
@@ -15,16 +16,16 @@ namespace ChatBots;
 
 static class Qdrant
 {
-    public static async Task<IVectorStoreRecordCollection<ulong, Movie>> CreateMovieCollectionAsync(
+    public static async Task<VectorStoreCollection<ulong, Movie>> CreateMovieCollectionAsync(
         IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
-        IVectorStore vectorStore, string collectionName)
+        VectorStore vectorStore, string collectionName)
     {
         var movies = vectorStore.GetCollection<ulong, Movie>(collectionName); // keys can only be ulong or Guid (for Qdrant?)
-        await movies.CreateCollectionIfNotExistsAsync();
+        await movies.EnsureCollectionExistsAsync(); //.CreateCollectionIfNotExistsAsync();
 
         foreach (var movie in TestData.GetMovies())
         {
-            movie.Vector = await embeddingGenerator.GenerateEmbeddingVectorAsync(movie.Description);
+            movie.Vector = (await embeddingGenerator.GenerateAsync(movie.Description)).Vector; //.GenerateEmbeddingVectorAsync(movie.Description);
             await movies.UpsertAsync(movie);
         }
 
@@ -90,27 +91,27 @@ static class Qdrant
         //https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/qdrant-connector
 
         //var vectorStore = new InMemoryVectorStore();
-        IVectorStore vectorStore = new QdrantVectorStore(new QdrantClient(hostQdrant));
+        VectorStore vectorStore = new QdrantVectorStore(new QdrantClient(hostQdrant), ownsClient: true); // setting ownsClient will dispose QdrantClient on dispose
         //var collection = new QdrantVectorStoreRecordCollection<Movie>(
         //    new QdrantClient(hostQdrant),
         //    collectionName: "movies",
         //    options: new() { HasNamedVectors = true });
-        IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator = new OllamaEmbeddingGenerator(
+        IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator = new OllamaApiClient(
             new Uri(urlOllama), embeddingModelName);
         var movies = await CreateMovieCollectionAsync(embeddingGenerator, vectorStore, collectionName);
 
         var query = "A family friendly movie";
-        var queryEmbedding = await embeddingGenerator.GenerateEmbeddingVectorAsync(query);
+        var queryEmbedding = await embeddingGenerator.GenerateAsync(query);
 
-        var searchOptions = new VectorSearchOptions<Movie>()
-        {
-            Top = 1
-            //VectorPropertyName = "Vector"
-        };
+        //var searchOptions = new VectorSearchOptions<Movie>()
+        //{
+        //    Top = 1
+        //    //VectorPropertyName = "Vector"
+        //};
 
-        var results = await movies.VectorizedSearchAsync(queryEmbedding, searchOptions);
+        var results = movies.SearchAsync(queryEmbedding.Vector, top: 1);//, searchOptions);
 
-        await foreach (var result in results.Results)
+        await foreach (var result in results)
         {
             Console.WriteLine($"Title: {result.Record.Title}");
             Console.WriteLine($"Description: {result.Record.Description}");

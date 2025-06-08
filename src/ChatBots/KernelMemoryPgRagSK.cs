@@ -1,6 +1,4 @@
-﻿#pragma warning disable SKEXP0020
-
-using ChatBots.Helpers;
+﻿using ChatBots.Helpers;
 using ChatBots.Plugins;
 using Helpers;
 using Microsoft.Extensions.DependencyInjection;

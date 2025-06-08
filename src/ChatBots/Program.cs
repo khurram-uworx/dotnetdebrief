@@ -96,10 +96,10 @@ static class Program
         options.Add(51, () => Qdrant.QuickStartAsync(hostQdrant, collectionName: "test_collection").Wait());
         Console.WriteLine("[52] Qdrant with Vector Data Extensions, movies collection will be created/used");
         options.Add(52, () => Qdrant.VectorDataExtensionsAsync(urlOllama, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
-        Console.WriteLine("[53] Qdrant RAG Scenario - Clinic");
-        options.Add(53, () => QdrantSemanticKernel.RagClinicScenarioAsync(urlOllama, textModel, urlQdrant, hostQdrant, collectionName: "clinicFacts").Wait());
-        Console.WriteLine("[54] Qdrant Semantic Search, movies collection will be created/used");
-        options.Add(54, () => QdrantSemanticKernel.SearchScenarioAsync(urlOllama, textModel, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
+        //Console.WriteLine("[53] Qdrant RAG Scenario - Semantic Memory - Clinic, clinicFacts collection will be created/used"); // Its deprecated
+        //options.Add(53, () => QdrantSemanticKernel.RagClinicScenarioUsingSemanticMemoryAsync(urlOllama, textModel, urlQdrant, hostQdrant, collectionName: "clinicFacts").Wait());
+        Console.WriteLine("[54] Qdrant RAG Scenario - Vector Search - movies collection will be created/used");
+        options.Add(54, () => QdrantSemanticKernel.RagClinicScenarioUsingVectorSearchAsync(urlOllama, textModel, embeddingModelName, hostQdrant, collectionName: "movies").Wait());
         Console.WriteLine("[55] Qdrant as Semantic Kernel Memory; RAG for wikipedia");
         options.Add(55, () => KernelMemoryQdrantRag.RagWikipediaScenarioAsync(urlOllama, textModel, embeddingModelName, urlQdrant).Wait());
         Console.WriteLine("[56] Qdrant as Semantic Kernel Memory; RAG for web pages (SK docs)");

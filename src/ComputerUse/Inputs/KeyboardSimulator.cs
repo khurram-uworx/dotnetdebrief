@@ -1,5 +1,5 @@
 ﻿using SharpHook;
-using SharpHook.Native;
+using SharpHook.Data;
 using System;
 using System.Collections.Generic;
 
@@ -28,7 +28,7 @@ class KeyboardSimulator
 
         // Stack to keep track of keys pressed
         Stack<KeyCode> keysDown = new Stack<KeyCode>();
-        ModifierMask currentMask = ModifierMask.None;
+        EventMask currentMask = EventMask.None;
 
         // Map key names to KeyCode enums
         var keyMap = new Dictionary<string, KeyCode>(StringComparer.OrdinalIgnoreCase)
@@ -49,13 +49,13 @@ class KeyboardSimulator
         };
 
         // Map modifier keys to ModifierMask enums
-        var modifierMap = new Dictionary<KeyCode, ModifierMask>
+        var modifierMap = new Dictionary<KeyCode, EventMask>
             {
-            { KeyCode.VcLeftShift, ModifierMask.Shift },
-            { KeyCode.VcLeftControl, ModifierMask.Ctrl },
-            { KeyCode.VcLeftAlt, ModifierMask.Alt },
-            { KeyCode.VcLeftMeta, ModifierMask.Meta },
-            { KeyCode.VcRightMeta, ModifierMask.Meta }
+            { KeyCode.VcLeftShift, EventMask.Shift },
+            { KeyCode.VcLeftControl, EventMask.Ctrl },
+            { KeyCode.VcLeftAlt, EventMask.Alt },
+            { KeyCode.VcLeftMeta, EventMask.Meta },
+            { KeyCode.VcRightMeta, EventMask.Meta }
         };
 
         // Press down all keys
@@ -69,7 +69,7 @@ class KeyboardSimulator
                 simulator.SimulateKeyPress(keyCode);
 
                 // Update the modifier mask if it's a modifier key
-                if (modifierMap.TryGetValue(keyCode, out ModifierMask modifier))
+                if (modifierMap.TryGetValue(keyCode, out EventMask modifier))
                 {
                     currentMask |= modifier;
                 }

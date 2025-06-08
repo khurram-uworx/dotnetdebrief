@@ -4,7 +4,6 @@ using ChatBots.Helpers;
 using Microsoft.SemanticKernel;
 using ModelContextProtocol.Client;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,26 +20,15 @@ class McpPlaywright
 
     public async Task HandleMcpPromptAsync(string prompt)
     {
-        await using var mcpClient = await McpClientFactory.CreateAsync(
-            new()
-            {
-                Id = "playwright",
-                Name = "Playwright",
-                TransportType = "stdio",
-                TransportOptions = new Dictionary<string, string>
-                {
-                    ["command"] = "npx",
-                    ["arguments"] = "-y @playwright/mcp@latest",
-                }
-            },
-            new()
-            {
-                ClientInfo = new()
-                {
-                    Name = "Playwright", Version = "1.0.0"
-                }
-            }).ConfigureAwait(false);
+        var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
+        {
+            Name = "Playwright",
+            Command = "npx",
+            Arguments = ["-y", "@playwright/mcp@latest"],
+        });
 
+        await using var mcpClient = await McpClientFactory.CreateAsync(clientTransport)
+            .ConfigureAwait(false);
 
         var tools = await mcpClient.EnumerateToolsAsync().ToListAsync();
         foreach (var tool in tools)

@@ -34,26 +34,15 @@ class McpRepository
     public async Task HandleMcpPromptAsync(string prompt)
     {
         // Github is one example; https://github.com/modelcontextprotocol/servers for many more
+        var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
+        {
+            Name = "GitHub",
+            Command = "npx",
+            Arguments = ["-y", "@modelcontextprotocol/server-github"],
+        });
         // Create an MCPClient for the GitHub server
-        await using var mcpClient = await McpClientFactory.CreateAsync(
-            new()
-            {
-                Id = "github",
-                Name = "GitHub",
-                TransportType = "stdio",
-                TransportOptions = new Dictionary<string, string>
-                {
-                    ["command"] = "npx", // yes our MCP Server is running on Node 
-                    ["arguments"] = "-y @modelcontextprotocol/server-github",
-                }
-            },
-            new()
-            {
-                ClientInfo = new()
-                {
-                    Name = "GitHub", Version = "1.0.0"
-                }
-            }).ConfigureAwait(false);
+        await using var mcpClient = await McpClientFactory.CreateAsync(clientTransport)
+            .ConfigureAwait(false);
 
 
         // Retrieve the list of tools available on the GitHub server

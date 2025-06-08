@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.AI;
+using OllamaSharp;
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -29,10 +30,10 @@ static class AIExtensionTools
         //    : "It's raining";
 
         // https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.AI.Ollama
-        IChatClient chatClient = new OllamaChatClient(new Uri(urlOllama), textModel)
-            .AsBuilder()
-            .UseFunctionInvocation()
-            .Build();
+        IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), textModel);
+            //.AsBuilder()
+            //.UseFunctionInvocation()
+            //.Build();
 
         //Console.WriteLine(await chatClient.CompleteAsync("Do I need an umbrella?",
         //    options: new ChatOptions

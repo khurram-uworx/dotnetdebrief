@@ -46,7 +46,7 @@ class KernelMemoryQdrantRagSK
         var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel,
             (b, c) =>
             {
-                b.AddQdrantVectorStore(hostQdrant);
+                b.Services.AddQdrantVectorStore(hostQdrant);
             });
 
         var config = new OllamaConfig
@@ -138,7 +138,7 @@ class KernelMemoryQdrantRagSK
 
                 //b.Services.AddSingleton<QdrantClient>(sp => new QdrantClient(hostQdrant));
                 //b.AddQdrantVectorStore();
-                b.AddQdrantVectorStore(hostQdrant);
+                b.Services.AddQdrantVectorStore(hostQdrant);
             });
 
         kernel.Plugins.AddFromType<ClinicPlugins>("Clinic");
