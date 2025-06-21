@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
+//https://github.com/microsoft/playwright-mcp
+//https://devblogs.microsoft.com/semantic-kernel/guest-blog-build-an-ai-app-that-can-browse-the-internet-using-microsofts-playwright-mcp-server-semantic-kernel-in-just-4-steps/
 class McpPlaywright
 {
     Kernel kernel = null;

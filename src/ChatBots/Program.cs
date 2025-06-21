@@ -26,7 +26,7 @@ static class Program
             * mistral, llama3.2
             * andthattoo/tinyagent-1.1b doesnt support tool calling
             */
-        var textModel = "qwen3:4b"; // "qwen2.5:3b";
+        var textModel = "llama3.2"; // "qwen2.5:3b, qwen3:4b";
 
         var options = new Dictionary<int, Action>();
         Console.WriteLine("Ensure your Ollama is up; choose your chat bot");
@@ -85,7 +85,27 @@ static class Program
             "Summarize the last four commits to the microsoft/semantic-kernel repository?").Wait());
         Console.WriteLine("[42] MCP: Playwright");
         options.Add(42, () => new McpPlaywright(urlOllama, textModel).HandleMcpPromptAsync(
-            "Browse to https://uworx.webhr.co/jobs/home using the Playwright tool and then summarize currently opened jobs you find on that web page").Wait());
+            //"Summarize AI news for me related to MCP on bing news. Open first link and summarize content").Wait());
+            """
+            You are a browser automation assistant. Use Playwright MCP to open a browser and find the cheapest available flight.
+            
+            Task: Search Google Flights and find the lowest-cost flight for the following routes:
+            - Lahore to Jeddah
+            - Lahore to Madina
+            - Islamabad to Jeddah
+            - Islamabad to Madina
+            
+            Consider any weekday (Monday through Friday). You can choose the day that gives the cheapest fare.
+            
+            Your objective:
+            Open Google Flights, url is https://www.google.com/travel/flights
+            For each route, search for flights
+            Pick the weekday that results in the lowest price
+            Record the airline, price, date, and departure time
+            
+            Use structured steps with Playwright MCP and return a list of results sorted by price ascending
+            """).Wait());
+            //"Browse to https://uworx.webhr.co/jobs/home using the Playwright tool and then summarize currently opened jobs you find on that web page").Wait());
 
         Console.WriteLine();
         Console.WriteLine("Run Qdrant first; docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant");
