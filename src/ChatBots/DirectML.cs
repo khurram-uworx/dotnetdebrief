@@ -4,9 +4,9 @@ using System.IO;
 
 namespace ChatBots;
 
-static class ML
+static class DirectML
 {
-    public static void MLTest(string textModel)
+    public static void Run(string textModel)
     {
         //string modelPath = @"C:\Users\khurram\.aitk\models\microsoft\Phi-3-mini-128k-instruct-onnx\directml\directml-int4-awq-block-128";
         //string modelPath = @"C:\Users\khurram\.aitk\models\microsoft\Phi-3-mini-4k-instruct-onnx\cpu_and_mobile\cpu-int4-rtn-block-32-acc-level-4";
