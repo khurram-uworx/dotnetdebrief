@@ -9,20 +9,19 @@ namespace ChatBots.Helpers
 {
     internal static class SemanticKernelHelper
     {
-        public static Kernel GetKernel(string urlOllama, string textModel, Action<IKernelBuilder, OpenAIClient> action = null)
+        public static Kernel GetKernel(string openApiUrl, string openApiKey, string openApiModel, Action<IKernelBuilder, OpenAIClient> action = null)
         {
             var options = new OpenAIClientOptions
             {
-                Endpoint = new Uri($"{urlOllama}/v1"), // Ollama
-                                                       // Endpoint = new Uri("http://127.0.0.1:5272/v1") // AI Toolkit
+                Endpoint = new Uri(openApiUrl),
                 NetworkTimeout = TimeSpan.FromMinutes(5)
             };
-            var openAIClient = new OpenAIClient(new ApiKeyCredential("x"), options);
+            var openAIClient = new OpenAIClient(new ApiKeyCredential(openApiKey), options);
 
             // Create a chat completion service
             var builder = Kernel.CreateBuilder();
             builder.AddOpenAIChatCompletion(
-                modelId: textModel,
+                modelId: openApiModel,
                 openAIClient);
 
             // Add enterprise components
@@ -32,5 +31,8 @@ namespace ChatBots.Helpers
 
             return builder.Build();
         }
+
+        public static Kernel GetKernel(string urlOllama, string textModel, Action<IKernelBuilder, OpenAIClient> action = null) =>
+            GetKernel(urlOllama, openApiKey: "x", textModel, action);
     }
 }

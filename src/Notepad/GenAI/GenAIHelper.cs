@@ -1,20 +1,14 @@
 ﻿using Microsoft.Extensions.AI;
-using OllamaSharp;
 using System.Runtime.CompilerServices;
 
 namespace Notepad.GenAI
 {
-    class OllamaGateway
+    static class GenAIHelper
     {
-        string url = null;
-
-        public OllamaGateway(string url) => this.url = url;
-
-        public async IAsyncEnumerable<string> MakeItProfessional(string textModel, string text,
+        public static async IAsyncEnumerable<string> MakeItProfessional(IChatClient chatClient,
+            string text,
             [EnumeratorCancellation] CancellationToken token)
         {
-            IChatClient chatClient = new OllamaApiClient(new Uri(this.url), textModel);
-
             List<ChatMessage> chatMessages = [];
             chatMessages.Add(new ChatMessage(ChatRole.System,
                 //"""
@@ -32,11 +26,10 @@ namespace Notepad.GenAI
                 if (update.Text is not null) yield return update.Text;
         }
 
-        public async IAsyncEnumerable<string> PassToLanguageModel(string textModel, string text,
+        public static async IAsyncEnumerable<string> PassToLanguageModel(IChatClient chatClient,
+            string text,
             [EnumeratorCancellation] CancellationToken token)
         {
-            IChatClient chatClient = new OllamaApiClient(new Uri(this.url), textModel);
-
             await foreach (var update in chatClient.GetStreamingResponseAsync(text, cancellationToken: token))
                 if (update.Text is not null) yield return update.Text;
         }

@@ -1,8 +1,13 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.Extensions.AI;
+using Microsoft.Win32;
 using Notepad.GenAI;
 using Notepad.Helper;
 using Notepad.Properties;
 using Notepad.Windows;
+using OllamaSharp;
+using OpenAI;
+using OpenAI.Chat;
+using System.ClientModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -132,6 +137,21 @@ namespace Notepad
             autoSaveTimer = new DispatcherTimer();
             autoSaveTimer.Interval = TimeSpan.FromSeconds(1);
             autoSaveTimer.Tick += AutoSaveTimer_Tick;
+        }
+
+        IChatClient GetChatClient(string selectedModel)
+        {
+            var openAiUrl = Environment.GetEnvironmentVariable("OPENAI_API_URL");
+            if (string.IsNullOrEmpty(openAiUrl))
+                return new OllamaApiClient(new Uri("http://localhost:11434"), selectedModel);
+
+            var openAiModel = Environment.GetEnvironmentVariable("OPENAI_MODEL") ?? selectedModel;
+            var openAiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "1234";
+
+            return new ChatClient(openAiModel, new ApiKeyCredential(openAiKey), new OpenAIClientOptions
+            {
+                Endpoint = new Uri(openAiUrl)
+            }).AsIChatClient();
         }
 
         #region File Menu Command's Code Implementation
@@ -527,10 +547,7 @@ namespace Notepad
 
         private async void MakeItProfessional_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var urlOllama = "http://localhost:11434";
             var sb = new StringBuilder();
-            var ollama = new OllamaGateway(urlOllama);
-
             var selectedModel = this.SelectedModel;
             var capturedText = TextArea.SelectedText;
 
@@ -539,7 +556,7 @@ namespace Notepad
                 this.ButtonStop.IsEnabled = true;
                 try
                 {
-                    await foreach (var text in ollama.MakeItProfessional(selectedModel, capturedText, this.source.Token))
+                    await foreach (var text in GenAIHelper.MakeItProfessional(GetChatClient(selectedModel), capturedText, this.source.Token))
                     {
                         if (!string.IsNullOrEmpty(text)) sb.Append(text);
                         this.TextArea.SelectedText = sb.ToString();
@@ -552,10 +569,7 @@ namespace Notepad
 
         private async void PassToLanguageModel_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var urlOllama = "http://localhost:11434";
             var sb = new StringBuilder();
-            var ollama = new OllamaGateway(urlOllama);
-
             string capturedText = null;
             var selectedModel = this.SelectedModel;
 
@@ -573,7 +587,7 @@ namespace Notepad
                 this.ButtonStop.IsEnabled = true;
                 try
                 {
-                    await foreach (var text in ollama.PassToLanguageModel(selectedModel, capturedText, this.source.Token))
+                    await foreach (var text in GenAIHelper.PassToLanguageModel(GetChatClient(selectedModel), capturedText, this.source.Token))
                     {
                         if (!string.IsNullOrEmpty(text)) sb.Append(text);
 

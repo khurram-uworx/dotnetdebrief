@@ -8,18 +8,15 @@ namespace ChatBots;
 
 static class OpenAI
 {
-    public static void Run(string urlOllama, string textModel)
+    public static void Run(string openAiUrl, string openAiKey, string openAiModel)
     {
         var options = new OpenAIClientOptions
         {
-            Endpoint = new Uri($"{urlOllama}/v1") // Ollama
-            // Endpoint = new Uri("http://127.0.0.1:5272/v1") // AI Toolkit
+            Endpoint = new Uri(openAiUrl)
         };
 
-        var openAIClient = new OpenAIClient(new ApiKeyCredential("x"), options);
-        var chatClient = openAIClient.GetChatClient(textModel);
-        //var chatClient = openAIClient.GetChatClient("Phi-3-mini-128k-cpu-int4-rtn-block-32-onnx");
-
+        var openAIClient = new OpenAIClient(new ApiKeyCredential(openAiKey), options);
+        var chatClient = openAIClient.GetChatClient(openAiModel);
         var chatCompletion = chatClient.CompleteChat(
             [
                 new SystemChatMessage("You are a helpful assistant. Be brief and succinct."),
