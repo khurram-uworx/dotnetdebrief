@@ -25,7 +25,8 @@
         <CommandBinding x:Name="NewWindow" Command="local:CustomNotepadCommands.NewWindow" Executed="NewWindow_Executed"/>
         <CommandBinding x:Name="SaveAs" Command="local:CustomNotepadCommands.SaveAs" Executed="SaveAs_Executed"/>
         <CommandBinding x:Name="SearchWithBing" Command="local:CustomNotepadCommands.SearchWithBing" CanExecute="SearchWithBing_CanExecute" Executed="SearchWithBing_Executed"/>
-        <CommandBinding x:Name="MakeItProfessional" Command="local:CustomNotepadCommands.MakeItProfessional" CanExecute="MakeItProfessional_CanExecute" Executed="MakeItProfessional_Executed"/>
+        <CommandBinding x:Name="CheckGrammerAndImprove" Command="local:CustomNotepadCommands.CheckGrammerAndImprove" CanExecute="GenAISelectedText_CanExecute" Executed="CheckGrammerAndImprove_Executed"/>
+        <CommandBinding x:Name="MakeItProfessional" Command="local:CustomNotepadCommands.MakeItProfessional" CanExecute="GenAISelectedText_CanExecute" Executed="MakeItProfessional_Executed"/>
         <CommandBinding x:Name="PassToLanguageModel" Command="local:CustomNotepadCommands.PassToLanguageModel" CanExecute="PassToLanguageModel_CanExecute" Executed="PassToLanguageModel_Executed"/>
         <CommandBinding x:Name="FindNext" Command="local:CustomNotepadCommands.FindNext" CanExecute="Find_CanExecute" Executed="FindNext_Executed"/>
         <CommandBinding x:Name="FindPrevious" Command="local:CustomNotepadCommands.FindPrevious" CanExecute="Find_CanExecute" Executed="FindPrevious_Executed"/>
@@ -168,6 +169,11 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
+                <MenuItem Header="_Check grammer and improve..." Command="local:CustomNotepadCommands.CheckGrammerAndImprove">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16"></TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="_Make it professional..." Command="local:CustomNotepadCommands.MakeItProfessional">
                     <MenuItem.Icon>
                         <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16"></TextBlock>
@@ -450,6 +456,11 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator></Separator>
+                    <MenuItem Header="_Check grammer and improve..." Command="local:CustomNotepadCommands.CheckGrammerAndImprove" InputGestureText=" ">
+                        <MenuItem.Icon>
+                            <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16" ></TextBlock>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Header="_Make it professional..." Command="local:CustomNotepadCommands.MakeItProfessional" InputGestureText=" ">
                         <MenuItem.Icon>
                             <TextBlock Text="&#xf6fa;" FontFamily="Segoe Fluent Icons" FontSize="16" ></TextBlock>

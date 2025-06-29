@@ -11,7 +11,7 @@ static class OpenAITools
 {
     //https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/openai/Azure.AI.OpenAI/tests/Samples/01_Chat.cs
 
-    public static void ChatWithTools(string urlOllama, string textModel)
+    public static void ChatWithTools(string openAiUrl, string openAiKey, string openAiModel)
     {
         static string GetCurrentWeather(string location, string unit = "celsius")
         {
@@ -43,11 +43,11 @@ static class OpenAITools
 
         var clientOptions = new OpenAIClientOptions
         {
-            Endpoint = new Uri($"{urlOllama}/v1") // Ollama
+            Endpoint = new Uri(openAiUrl)
         };
 
-        var openAIClient = new OpenAIClient(new ApiKeyCredential("x"), clientOptions);
-        var chatClient = openAIClient.GetChatClient(textModel);
+        var openAIClient = new OpenAIClient(new ApiKeyCredential(openAiKey), clientOptions);
+        var chatClient = openAIClient.GetChatClient(openAiModel);
 
         ChatCompletionOptions options = new()
         {

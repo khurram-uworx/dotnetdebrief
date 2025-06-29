@@ -28,6 +28,8 @@ namespace Notepad.Commands_Binding
         /// </summary>
         public static RoutedUICommand SearchWithBing { get; private set; }
 
+        public static RoutedUICommand CheckGrammerAndImprove { get; private set; }
+
         public static RoutedUICommand MakeItProfessional { get; private set; }
 
         public static RoutedUICommand PassToLanguageModel { get; private set; }
@@ -87,7 +89,12 @@ namespace Notepad.Commands_Binding
                 new KeyGesture(Key.E, ModifierKeys.Control, "Ctrl+E")
             });
 
-            MakeItProfessional = new RoutedUICommand("Make it professional...", "MaleItProfessional", typeof(CustomNotepadCommands), new InputGestureCollection
+            CheckGrammerAndImprove = new RoutedUICommand("Check Grammer and Improve...", "CheckGrammerAndImprove", typeof(CustomNotepadCommands), new InputGestureCollection
+            {
+                new KeyGesture(Key.F10, ModifierKeys.Control, "F9")
+            });
+
+            MakeItProfessional = new RoutedUICommand("Make it professional...", "MakeItProfessional", typeof(CustomNotepadCommands), new InputGestureCollection
             {
                 new KeyGesture(Key.F10, ModifierKeys.Control, "F10")
             });

@@ -1,8 +1,13 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.Extensions.AI;
+using Microsoft.Win32;
 using Notepad.GenAI;
 using Notepad.Helper;
 using Notepad.Properties;
 using Notepad.Windows;
+using OllamaSharp;
+using OpenAI;
+using OpenAI.Chat;
+using System.ClientModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -23,19 +28,15 @@ namespace Notepad
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        const string OllamaUrl = "http://localhost:11434";
         CancellationTokenSource source = new CancellationTokenSource();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        private string _selectedModel = "llama3.2";
+        private string _selectedModel = null;
 
-        public ObservableCollection<string> Models { get; } = new()
-        {
-            "deepscaler",
-            "deepseek-r1:1.5b",
-            "llama3.2",
-            "qwen2.5:3b"
-        }; 
+        public ObservableCollection<string> Models { get; } = new();
+
         public string SelectedModel
         {
             get => _selectedModel;
@@ -108,7 +109,6 @@ namespace Notepad
             InitializeComponent();
 
             DataContext = this; // Ensure binding works
-            SelectedModel = Models[2]; // Set initial value (llama3.2)
 
             // Ensure the required font is installed.
             FontHelper.InstallFontIfNotInstalled("Segoe Fluent Icons", "Notepad.Resources.Segoe Fluent Icons.ttf");
@@ -132,6 +132,40 @@ namespace Notepad
             autoSaveTimer = new DispatcherTimer();
             autoSaveTimer.Interval = TimeSpan.FromSeconds(1);
             autoSaveTimer.Tick += AutoSaveTimer_Tick;
+
+            this.Loaded += delegate
+            {
+                var openAiUrl = Environment.GetEnvironmentVariable("OPENAI_API_URL");
+                if (string.IsNullOrEmpty(openAiUrl))
+                    try
+                    {
+                        var client = new OllamaApiClient(OllamaUrl);
+                        var models = client.ListLocalModelsAsync()
+                            .Result
+                            .Select(m => m.Name)
+                            .Order();
+                        foreach (var m in models)
+                            this.Models.Add(m);
+
+                        this.SelectedModel = models.FirstOrDefault();
+                    }
+                    catch { }
+            };
+        }
+
+        IChatClient GetChatClient(string selectedModel)
+        {
+            var openAiUrl = Environment.GetEnvironmentVariable("OPENAI_API_URL");
+            if (string.IsNullOrEmpty(openAiUrl))
+                return new OllamaApiClient(new Uri(OllamaUrl), selectedModel);
+
+            var openAiModel = Environment.GetEnvironmentVariable("OPENAI_MODEL") ?? selectedModel;
+            var openAiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "1234";
+
+            return new ChatClient(openAiModel, new ApiKeyCredential(openAiKey), new OpenAIClientOptions
+            {
+                Endpoint = new Uri(openAiUrl)
+            }).AsIChatClient();
         }
 
         #region File Menu Command's Code Implementation
@@ -519,18 +553,15 @@ namespace Notepad
             Process.Start($"microsoft-edge:https://www.bing.com/search?q={Uri.EscapeDataString(TextArea.SelectedText)}");
         }
 
-        private void MakeItProfessional_CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        private void GenAISelectedText_CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
             e.CanExecute = TextArea.SelectedText.Length > 0;
 
         private void PassToLanguageModel_CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
             e.CanExecute = TextArea.Text.Length > 0 || TextArea.SelectedText.Length > 0;
 
-        private async void MakeItProfessional_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void CheckGrammerAndImprove_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var urlOllama = "http://localhost:11434";
             var sb = new StringBuilder();
-            var ollama = new OllamaGateway(urlOllama);
-
             var selectedModel = this.SelectedModel;
             var capturedText = TextArea.SelectedText;
 
@@ -539,25 +570,50 @@ namespace Notepad
                 this.ButtonStop.IsEnabled = true;
                 try
                 {
-                    await foreach (var text in ollama.MakeItProfessional(selectedModel, capturedText, this.source.Token))
+                    await foreach (var text in GenAIHelper.CheckGrammerAndImprove(GetChatClient(selectedModel), capturedText, this.source.Token))
                     {
                         if (!string.IsNullOrEmpty(text)) sb.Append(text);
                         this.TextArea.SelectedText = sb.ToString();
                     }
                 }
-                catch { }
+                finally
+                {
+                    this.TextArea.SelectionLength = 0;
+                }
+                this.ButtonStop.IsEnabled = false;
+            }
+        }
+
+        private async void MakeItProfessional_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var sb = new StringBuilder();
+            var selectedModel = this.SelectedModel;
+            var capturedText = TextArea.SelectedText;
+
+            if (capturedText is not null)
+            {
+                this.ButtonStop.IsEnabled = true;
+                try
+                {
+                    await foreach (var text in GenAIHelper.MakeItProfessional(GetChatClient(selectedModel), capturedText, this.source.Token))
+                    {
+                        if (!string.IsNullOrEmpty(text)) sb.Append(text);
+                        this.TextArea.SelectedText = sb.ToString();
+                    }
+                }
+                finally
+                {
+                    this.TextArea.SelectionLength = 0;
+                }
                 this.ButtonStop.IsEnabled = false;
             }
         }
 
         private async void PassToLanguageModel_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var urlOllama = "http://localhost:11434";
             var sb = new StringBuilder();
-            var ollama = new OllamaGateway(urlOllama);
-
-            string capturedText = null;
             var selectedModel = this.SelectedModel;
+            string capturedText = null;
 
             if (TextArea.SelectedText.Length > 0)
                 capturedText = TextArea.SelectedText;
@@ -573,7 +629,7 @@ namespace Notepad
                 this.ButtonStop.IsEnabled = true;
                 try
                 {
-                    await foreach (var text in ollama.PassToLanguageModel(selectedModel, capturedText, this.source.Token))
+                    await foreach (var text in GenAIHelper.PassToLanguageModel(GetChatClient(selectedModel), capturedText, this.source.Token))
                     {
                         if (!string.IsNullOrEmpty(text)) sb.Append(text);
 
@@ -583,7 +639,10 @@ namespace Notepad
                             this.TextArea.Text = sb.ToString();
                     }
                 }
-                catch { }
+                finally
+                {
+                    this.TextArea.SelectionLength = 0;
+                }
                 this.ButtonStop.IsEnabled = false;
             }
         }

@@ -8,7 +8,6 @@ static class Program
 {
     static async Task Main(string[] args)
     {
-        var urlOllama = "http://localhost:11434";
         /*
             * all-minilm all-MiniLM-L6-v2
             *      Best for lightweight, fast, and general-purpose use cases where resource efficiency is critical
@@ -26,19 +25,21 @@ static class Program
             * mistral, llama3.2
             * andthattoo/tinyagent-1.1b doesnt support tool calling
             */
-        var textModel = "llama3.2"; // "qwen2.5:3b, qwen3:4b";
+        var textModel = Environment.GetEnvironmentVariable("OPENAI_MODEL") ?? "llama3.2"; //qwen2.5:3b, qwen3:4b
+        // Phi-3-mini-128k-cpu-int4-rtn-block-32-onnx
+        var urlOllama = Environment.GetEnvironmentVariable("OPENAI_API_URL") ?? "http://localhost:11434/v1"; //http://127.0.0.1:5272/v1  AI Toolkit
+        var openAiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "1234";
 
         var options = new Dictionary<int, Action>();
         Console.WriteLine("Ensure your Ollama is up; choose your chat bot");
 
         Console.WriteLine("[1] OpenAI Library Chat Completion");
-        options.Add(1, () => OpenAI.Run(urlOllama, textModel));
+        options.Add(1, () => OpenAI.Run(urlOllama, openAiKey, textModel));
+        Console.WriteLine("[2] OptionAI Tools");
+        options.Add(2, () => OpenAITools.ChatWithTools(urlOllama, openAiKey, textModel));
 
-        Console.WriteLine("[2] DirectML Chat Completion");
-        options.Add(2, () => ML.MLTest(textModel: "directml-int4-awq-block-128"));
-
-        Console.WriteLine("[3] OptionAI Tools");
-        options.Add(3, () => OpenAITools.ChatWithTools(urlOllama, textModel));
+        Console.WriteLine("[3] DirectML Chat Completion");
+        options.Add(3, () => ML.MLTest(textModel: "directml-int4-awq-block-128"));
 
         Console.WriteLine("[4] AutoGen Hello World");
         options.Add(4, () => AutoGenChats.HelloOllamaWorldAsync(urlOllama, textModel).Wait());
