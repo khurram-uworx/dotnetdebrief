@@ -80,7 +80,7 @@
     <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.60.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Yaml" Version="1.60.0" />
     <PackageReference Include="ModelContextProtocol" Version="0.3.0-preview.2" />
-    <PackageReference Include="OllamaSharp" Version="5.2.7" />
+    <PackageReference Include="OllamaSharp" Version="5.2.8" />
     <PackageReference Include="SmartComponents.LocalEmbeddings.SemanticKernel" Version="0.1.0-preview10148" />
   </ItemGroup>
 
