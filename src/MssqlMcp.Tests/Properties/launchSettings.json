@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "MssqlMcp.Tests": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -88,8 +88,19 @@ static class Program
         Console.WriteLine("[41] MCP: Github Repository");
         options.Add(41, () => new McpRepository(inferenceUrl, textModel).HandleMcpPromptAsync(
             "Summarize the last four commits to the microsoft/semantic-kernel repository?").Wait());
-        Console.WriteLine("[42] MCP: Playwright");
-        options.Add(42, () => new McpPlaywright(inferenceUrl, textModel).HandleMcpPromptAsync(
+        Console.WriteLine("[42] MCP: Talk to your Northwind database");
+        options.Add(42, () => new McpDatabase(inferenceUrl, inferenceKey, textModel).HandleMcpPromptAsync(
+            """
+            You are a sales assistant, use the Database MCP to access the sales database. The schema of the database is following:
+
+            - Customers are stored in Customers table
+            - Products are stored in Products table
+            - Orders are stored in Orders table
+
+            Determine the number of customers in London
+            """).Wait());
+        Console.WriteLine("[43] MCP: Playwright");
+        options.Add(43, () => new McpPlaywright(inferenceUrl, textModel).HandleMcpPromptAsync(
             //"Summarize AI news for me related to MCP on bing news. Open first link and summarize content").Wait());
             """
             You are a browser automation assistant. Use Playwright MCP to open a browser and find the cheapest available flight.
