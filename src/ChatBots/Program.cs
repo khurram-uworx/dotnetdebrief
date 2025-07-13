@@ -86,7 +86,7 @@ static class Program
 
         Console.WriteLine();
         Console.WriteLine("[41] MCP: Github Repository");
-        options.Add(41, () => new McpRepository(inferenceUrl, textModel).HandleMcpPromptAsync(
+        options.Add(41, () => new McpRepository(inferenceUrl, inferenceKey, textModel).HandleMcpPromptAsync(
             "Summarize the last four commits to the microsoft/semantic-kernel repository?").Wait());
         Console.WriteLine("[42] MCP: Talk to your Northwind database");
         options.Add(42, () => new McpDatabase(inferenceUrl, inferenceKey, textModel).HandleMcpPromptAsync(
@@ -100,7 +100,7 @@ static class Program
             Determine the number of customers in London
             """).Wait());
         Console.WriteLine("[43] MCP: Playwright");
-        options.Add(43, () => new McpPlaywright(inferenceUrl, textModel).HandleMcpPromptAsync(
+        options.Add(43, () => new McpPlaywright(inferenceUrl, inferenceKey, textModel).HandleMcpPromptAsync(
             //"Summarize AI news for me related to MCP on bing news. Open first link and summarize content").Wait());
             """
             You are a browser automation assistant. Use Playwright MCP to open a browser and find the cheapest available flight.

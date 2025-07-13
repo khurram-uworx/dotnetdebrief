@@ -28,7 +28,7 @@ class McpDatabase
         var parentPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", ".."));
         var path = Path.Combine(parentPath,
                 "MssqlMcp", "bin", "Release", "net8.0", "MssqlMcp.exe");
-        // E:\trainings\uworx\uworx-dotnetdebrief\src\MssqlMcp\bin\Release\net8.0\MssqlMcp.exe
+
         var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
         {
             Name = "Sql",
@@ -38,23 +38,17 @@ class McpDatabase
                 { "CONNECTION_STRING", "Server=.;Database=Northwind;Trusted_Connection=True;TrustServerCertificate=True" }
             }
         });
-        // Create an MCPClient for the GitHub server
+
         await using var mcpClient = await McpClientFactory.CreateAsync(clientTransport)
             .ConfigureAwait(false);
 
-
-        // Retrieve the list of tools available on the GitHub server
         var tools = await mcpClient.EnumerateToolsAsync().ToListAsync();
-        // hydrated so we can use Select later; seeing SelectAsync still hurt
         foreach (var tool in tools)
             Console.WriteLine($"{tool.Name}: {tool.Description}");
 
         this.kernel.Plugins.AddFromFunctions("sql", tools.Select(
             aiFunction => aiFunction.AsKernelFunction()));
 
-        // frontier models like gpt/claude can work seamlessly
-        // our Ollama SLMs might struggle to infer MCP commands and at times we have to guide it
-        // its similar how you have to guide interns / juniors at every step
         prompt = $""""
             Instructions:
             You are database assistant having access to Database functions. Use these available functions to perform what user is asking you.

@@ -4,7 +4,6 @@ using ChatBots.Helpers;
 using Microsoft.SemanticKernel;
 using ModelContextProtocol.Client;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,9 +25,9 @@ class McpRepository
 
     Kernel kernel = null;
 
-    public McpRepository(string urlOllama, string textModel)
+    public McpRepository(string openApiUrl, string openApiKey, string openApiModel)
     {
-        this.kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
+        this.kernel = SemanticKernelHelper.GetKernel(openApiUrl, openApiKey, openApiModel);
     }
 
     public async Task HandleMcpPromptAsync(string prompt)
@@ -40,14 +39,12 @@ class McpRepository
             Command = "npx",
             Arguments = ["-y", "@modelcontextprotocol/server-github"],
         });
-        // Create an MCPClient for the GitHub server
+
         await using var mcpClient = await McpClientFactory.CreateAsync(clientTransport)
             .ConfigureAwait(false);
 
-
         // Retrieve the list of tools available on the GitHub server
         var tools = await mcpClient.EnumerateToolsAsync().ToListAsync();
-        // hydrated so we can use Select later; seeing SelectAsync still hurt
         foreach (var tool in tools)
             Console.WriteLine($"{tool.Name}: {tool.Description}");
 

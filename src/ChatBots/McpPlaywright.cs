@@ -15,9 +15,9 @@ class McpPlaywright
 {
     Kernel kernel = null;
 
-    public McpPlaywright(string urlOllama, string textModel)
+    public McpPlaywright(string openApiUrl, string openApiKey, string openApiModel)
     {
-        this.kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
+        this.kernel = SemanticKernelHelper.GetKernel(openApiUrl, openApiKey, openApiModel);
     }
 
     public async Task HandleMcpPromptAsync(string prompt)
