@@ -1,10 +1,18 @@
+using Microsoft.Agents.Builder;
+using Microsoft.Agents.Builder.App;
+using Microsoft.Agents.Hosting.AspNetCore;
+using Microsoft.Agents.Storage;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.SemanticKernel;
+using System;
+using System.Threading;
 using The365Agent;
 using The365Agent.Bot.Agents;
-using Microsoft.SemanticKernel;
-using Microsoft.Agents.Hosting.AspNetCore;
-using Microsoft.Agents.Builder.App;
-using Microsoft.Agents.Builder;
-using Microsoft.Agents.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +20,6 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
 builder.Logging.AddConsole();
-
 
 // Register Semantic Kernel
 builder.Services.AddKernel();
