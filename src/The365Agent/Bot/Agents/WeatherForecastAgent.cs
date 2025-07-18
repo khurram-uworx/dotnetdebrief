@@ -1,9 +1,11 @@
-﻿using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using System;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 using The365Agent.Bot.Plugins;
 
 namespace The365Agent.Bot.Agents;
