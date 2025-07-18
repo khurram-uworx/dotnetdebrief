@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,6 +15,9 @@ using Microsoft.Teams.Apps.Activities;
 using Microsoft.Teams.Apps.Annotations;
 
 using ModelContextProtocol.Client;
+using ModelContextProtocol.Protocol;
+
+using Tools;
 
 namespace TheTeamsAgent;
 
@@ -34,22 +36,10 @@ public class MainController
     {
         if (this.initialized) return kernel;
 
-        var parentPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ".."));
-        var path = Path.Combine(parentPath,
-                "MssqlMcp", "bin", "Release", "net8.0", "MssqlMcp.exe");
-
-        var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
-        {
-            Name = "Sql",
-            Command = path,
-            EnvironmentVariables = new Dictionary<string, string?>
-            {
-                { "CONNECTION_STRING", "Server=.;Database=Northwind;Trusted_Connection=True;TrustServerCertificate=True" }
-            }
-        });
-
+        var clientTransport = new StreamClientTransport(EchoTool.ClientOutput, EchoTool.ClientInput);
         var mcpClient = McpClientFactory.CreateAsync(clientTransport).Result;
-                var toolsList = new List<McpClientTool>();
+        var toolsList = new List<McpClientTool>();
+        
         await foreach (var tool in mcpClient.EnumerateToolsAsync())
         {
             Console.WriteLine($"{tool.Name}: {tool.Description}");
@@ -73,6 +63,27 @@ public class MainController
         if (!activity.Properties.TryGetValue("conversation.chatHistory", out var chatHistoryObj) || chatHistoryObj is not ChatHistory)
         {
             chatHistory = new ChatHistory();
+            chatHistory.Add(new ChatMessageContent(AuthorRole.System,
+                """
+                You are a helpful reporting assistant. You can answer questions by suggesting the reports and can generate the selected report using the sql tool
+
+                The system has the following reports available:
+                - Report1: The velocity of a specified team
+                - Report2: The current sprint status for a specified team
+                - Report3: Summarize the progress of a specified team
+
+                We have following teams:
+                - Alpha
+                - Bravo
+                - Charlie
+
+                IMPORTANT
+                - Always use the name of the report as it is returned by the system, do not change it.
+                - Always use the team name from the list above, do not change it.
+                - Always use the report url as it is returned by the system, do not change it.
+
+                """));
+
             activity.Properties["conversation.chatHistory"] = chatHistory;
         }
         else

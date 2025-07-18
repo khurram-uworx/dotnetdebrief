@@ -1,4 +1,5 @@
 using System;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,8 @@ using Microsoft.Teams.Plugins.AspNetCore.Extensions;
 
 using TheTeamsAgent;
 
+using Tools;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddTeams();
@@ -18,6 +21,12 @@ builder.Services.AddTransient<MainController>();
 
 builder.Logging.AddConsole();
 builder.Services.AddKernel();
+builder.Services.AddMcpServer()
+    .WithStreamServerTransport(EchoTool.ServerInput, EchoTool.ServerOutput)
+    //.WithToolsFromAssembly();
+    //.WithTools<EchoTool>();
+    //WithTools<Mssql.McpServer.Tools>();
+    .WithTools<ReportingTool>();
 
 var config = builder.Configuration.Get<ConfigOptions>();
 
@@ -32,8 +41,9 @@ if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OPENAI_API_URL")) 
     );
 else
     builder.Services.AddOpenAIChatCompletion(
-        modelId: config.OpenAI.DefaultModel,
-        apiKey: config.OpenAI.ApiKey);
+        modelId: "llama3.2",
+        endpoint: new Uri("http://localhost:11434/v1"),
+        apiKey: "x");
 
 var app = builder.Build();
 
