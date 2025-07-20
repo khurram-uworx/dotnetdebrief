@@ -141,7 +141,7 @@ class KernelMemoryQdrantRagSK
                 b.Services.AddQdrantVectorStore(hostQdrant);
             });
 
-        kernel.Plugins.AddFromType<ClinicPlugins>("Clinic");
+        kernel.Plugins.AddFromType<ClinicPlugin>("Clinic");
 
         var config = new OllamaConfig
         {

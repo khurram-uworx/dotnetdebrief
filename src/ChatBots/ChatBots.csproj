@@ -63,24 +63,25 @@
 
   <ItemGroup>
     <PackageReference Include="AutoGen" Version="0.2.3" />
-    <PackageReference Include="Azure.AI.OpenAI" Version="2.2.0-beta.5" />
-    <PackageReference Include="Microsoft.Extensions.AI" Version="9.7.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.7" />
+    <PackageReference Include="Dapplo.Jira" Version="1.1.47" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="9.9.1" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.9.1-preview.1.25474.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" Version="9.7.0" />
     <PackageReference Include="Microsoft.KernelMemory.AI.Ollama" Version="0.98.250508.3" />
     <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.98.250508.3" />
     <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.98.250508.3" />
     <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Qdrant" Version="0.98.250508.3" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.8.3" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.60.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.60.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.PgVector" Version="1.60.0-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.60.0-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.60.0-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.60.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Yaml" Version="1.60.0" />
-    <PackageReference Include="ModelContextProtocol" Version="0.3.0-preview.3" />
-    <PackageReference Include="OllamaSharp" Version="5.2.10" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.9.2" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.65.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.65.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.PgVector" Version="1.65.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.65.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.65.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.65.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Yaml" Version="1.65.0" />
+    <PackageReference Include="ModelContextProtocol" Version="0.4.0-preview.1" />
+    <PackageReference Include="OllamaSharp" Version="5.4.7" />
     <PackageReference Include="SmartComponents.LocalEmbeddings.SemanticKernel" Version="0.1.0-preview10148" />
   </ItemGroup>
 

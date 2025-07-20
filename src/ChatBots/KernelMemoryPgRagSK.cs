@@ -59,7 +59,7 @@ class KernelMemoryPgRagSK
 
         var kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel,
             (b, c) => b.Services.AddPostgresVectorStore(connectionString));
-        kernel.Plugins.AddFromType<ClinicPlugins>("Clinic");
+        kernel.Plugins.AddFromType<ClinicPlugin>("Clinic");
 
         var config = new OllamaConfig
         {

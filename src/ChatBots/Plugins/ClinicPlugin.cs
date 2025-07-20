@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace ChatBots.Plugins;
 
-class ClinicPlugins
+class ClinicPlugin
 {
     [KernelFunction("get_day")]
     [Description("Gets today's day of the week")]

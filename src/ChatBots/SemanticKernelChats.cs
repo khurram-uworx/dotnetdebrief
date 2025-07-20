@@ -3,6 +3,7 @@
 
 using ChatBots.Helpers;
 using ChatBots.Plugins;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -81,7 +82,7 @@ Give me a TLDR with the fewest words.";
         Console.WriteLine(await kernel.InvokeAsync(translator, new() { ["input"] = summary.ToString() }));
     }
 
-    public static async Task LightsPluginAsync(string urlOllama, string textModel)
+    static async Task pluginAsync(string urlOllama, string textModel, Action<Kernel> attach)
     {
         //https://learn.microsoft.com/en-us/semantic-kernel/get-started/quick-start-guide
 
@@ -90,8 +91,8 @@ Give me a TLDR with the fewest words.";
         // Retrieve the chat completion service
         var chatCompletionService = kernel.Services.GetRequiredService<IChatCompletionService>();
 
-        kernel.Plugins.AddFromType<LightsPlugin>("Lights");
-
+        if (null != attach) attach(kernel);
+        
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {
             //ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions, // this cant be used together with FunctionChoiceBehavior
@@ -131,6 +132,12 @@ Give me a TLDR with the fewest words.";
             history.AddMessage(result.Role, result.Content ?? string.Empty);
         } while (userInput is not null);
     }
+
+    public static async Task LightsPluginAsync(string urlOllama, string textModel) =>
+        await pluginAsync(urlOllama, textModel, k => k.Plugins.AddFromType<LightsPlugin>("Lights"));
+
+    public static async Task JiraPluginAsync(string urlOllama, string textModel) =>
+        await pluginAsync(urlOllama, textModel, k => k.Plugins.AddFromType<JiraPlugin>("Jira"));
 
     public static async Task RagScenarioAsync(string urlOllama, string textModel)
     {

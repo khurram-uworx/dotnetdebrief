@@ -55,10 +55,12 @@ static class Program
         options.Add(11, () => SemanticKernelChats.HelloWorldAsync(inferenceUrl, textModel).Wait());
         Console.WriteLine("[12] SK Prompt Scenario");
         options.Add(12, () => SemanticKernelChats.PromptScenarioAsync(inferenceUrl, textModel).Wait());
-        Console.WriteLine("[13] SK Plugin; try Please toggle all the lights");
+        Console.WriteLine("[13] SK Lights Plugin; try Please toggle all the lights");
         options.Add(13, () => SemanticKernelChats.LightsPluginAsync(inferenceUrl, textModel).Wait());
-        Console.WriteLine("[14] SK RAG Scenario");
-        options.Add(14, () => SemanticKernelChats.RagScenarioAsync(inferenceUrl, textModel).Wait());
+        Console.WriteLine("[14] SK Jira Plugin");
+        options.Add(14, () => SemanticKernelChats.JiraPluginAsync(inferenceUrl, textModel).Wait());
+        Console.WriteLine("[19] SK RAG Scenario");
+        options.Add(19, () => SemanticKernelChats.RagScenarioAsync(inferenceUrl, textModel).Wait());
 
         Console.WriteLine("[21] AI Extensions Structured Output");
         options.Add(21, () => AIExtensions.StructuredOutputAsync(inferenceUrl, textModel).Wait());
