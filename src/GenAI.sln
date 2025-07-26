@@ -28,6 +28,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MssqlMcp.Tests", "MssqlMcp.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheTeamsAgent", "TheTeamsAgent\TheTeamsAgent.csproj", "{38B8B62C-737D-CB54-D54E-B5981BE492A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiChatWeb", "AiChatWeb\AiChatWeb.csproj", "{ED6B2EEB-6E26-DB5F-C675-3751B4E85E4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McpServers", "McpServers\McpServers.csproj", "{3C4FD569-3E48-9C4A-BFDB-C71E846F493C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +80,14 @@ Global
 		{38B8B62C-737D-CB54-D54E-B5981BE492A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38B8B62C-737D-CB54-D54E-B5981BE492A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38B8B62C-737D-CB54-D54E-B5981BE492A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED6B2EEB-6E26-DB5F-C675-3751B4E85E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED6B2EEB-6E26-DB5F-C675-3751B4E85E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED6B2EEB-6E26-DB5F-C675-3751B4E85E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED6B2EEB-6E26-DB5F-C675-3751B4E85E4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C4FD569-3E48-9C4A-BFDB-C71E846F493C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C4FD569-3E48-9C4A-BFDB-C71E846F493C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C4FD569-3E48-9C4A-BFDB-C71E846F493C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C4FD569-3E48-9C4A-BFDB-C71E846F493C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
