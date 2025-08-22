@@ -6,14 +6,18 @@ This project is an AI chat application that demonstrates how to chat with custom
 > Before running this project you need to configure the API keys or endpoints for the providers you have chosen. See below for details specific to your choices.
 
 # Configure the AI Model Provider
-To use models hosted by GitHub Models, you will need to create a GitHub personal access token with `models:read` permissions, but no other scopes or permissions. See [Prototyping with AI models](https://docs.github.com/github-models/prototyping-with-ai-models) and [Managing your personal access tokens](https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) in the GitHub Docs for more information.
+## Using OpenAI
 
-From the command line, configure your token for this project using .NET User Secrets by running the following commands:
+To call the OpenAI REST API, you will need an API key. To obtain one, first [create a new OpenAI account](https://platform.openai.com/signup) or [log in](https://platform.openai.com/login). Next, navigate to the API key page and select "Create new secret key", optionally naming the key. Make sure to save your API key somewhere safe and do not share it with anyone.
 
-```sh
-cd <<your-project-directory>>
-dotnet user-secrets set GitHubModels:Token YOUR-TOKEN
-```
+Configure your API key for this project, using .NET User Secrets:
 
-Learn more about [prototyping with AI models using GitHub Models](https://docs.github.com/github-models/prototyping-with-ai-models).
+1. In Visual Studio, right-click on your project in the Solution Explorer and select "Manage User Secrets".
+2. This will open a secrets.json file where you can store your API key without them being tracked in source control. Add the following key and value to the file:
+
+   ```json
+   {
+     "OpenAI:Key": "YOUR-API-KEY"
+   }
+   ```
 
