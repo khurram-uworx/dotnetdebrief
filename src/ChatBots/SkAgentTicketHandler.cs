@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-class AgentTicketHandler
+class SkAgentTicketHandler
 {
     //https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-chat
     
@@ -63,7 +63,7 @@ class AgentTicketHandler
 
     Kernel kernel = null;
 
-    public AgentTicketHandler(string urlOllama, string textModel)
+    public SkAgentTicketHandler(string urlOllama, string textModel)
     {
         this.kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
     }

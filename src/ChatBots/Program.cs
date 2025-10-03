@@ -79,12 +79,12 @@ static class Program
                 
                 I am your premium customer and my service/connection id is khurram-uworx
             """;
-            new AgentTicketHandler(inferenceUrl, textModel).HandleTicketAsync(ticket).Wait();
+            new SkAgentTicketHandler(inferenceUrl, textModel).HandleTicketAsync(ticket).Wait();
         });
         Console.WriteLine("[32] SK Agents - Philophers");
-        options.Add(32, () => new AgentDebate(inferenceUrl, textModel).DebateAsync("How can we ensure that AI benefits all of humanity?").Wait());
+        options.Add(32, () => new SkAgentDebate(inferenceUrl, textModel).DebateAsync("How can we ensure that AI benefits all of humanity?").Wait());
         Console.WriteLine("[33*] SK Agents - Creative Writer; not completed / working");
-        options.Add(33, () => new AgentCreativeWriter(inferenceUrl, textModel).WriteCreativelyAsync("How can we ensure that AI benefits all of humanity?").Wait());
+        options.Add(33, () => new SkAgentCreativeWriter(inferenceUrl, textModel).WriteCreativelyAsync("How can we ensure that AI benefits all of humanity?").Wait());
 
         Console.WriteLine();
         Console.WriteLine("[41] MCP: Github Repository");

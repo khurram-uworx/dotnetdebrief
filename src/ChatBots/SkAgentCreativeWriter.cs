@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-class AgentCreativeWriter
+class SkAgentCreativeWriter
 {
     //https://github.com/Azure-Samples/aspire-semantic-kernel-creative-writer
 
@@ -37,7 +37,7 @@ class AgentCreativeWriter
 
     Kernel kernel = null;
 
-    public AgentCreativeWriter(string urlOllama, string textModel)
+    public SkAgentCreativeWriter(string urlOllama, string textModel)
     {
         this.kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
     }

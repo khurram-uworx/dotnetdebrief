@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace ChatBots;
 
-class AgentDebate
+class SkAgentDebate
 {
     //https://github.com/microsoft/all-things-azure/blob/main/agentic-philosophers
     //const string PlatoFileName = "Plato.pdf";
@@ -61,7 +61,7 @@ class AgentDebate
         }
     }
 
-    public AgentDebate(string urlOllama, string textModel)
+    public SkAgentDebate(string urlOllama, string textModel)
     {
         this.kernel = SemanticKernelHelper.GetKernel(urlOllama, textModel);
     }
