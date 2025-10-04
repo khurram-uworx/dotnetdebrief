@@ -42,13 +42,16 @@ static class Program
         Console.WriteLine("[3] OptionAI Tools");
         options.Add(3, () => OpenAITools.ChatWithTools(inferenceUrl, inferenceKey, textModel));
 
-        Console.WriteLine("[4] DirectML Chat Completion");
-        options.Add(4, () => DirectML.Run(textModel: "directml-int4-awq-block-128"));
+        Console.WriteLine("[4] Microsoft Agent Framework : Writer - Editor");
+        options.Add(4, () => Agents.WriterEditorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
 
-        Console.WriteLine("[5] AutoGen Hello World");
-        options.Add(5, () => AutoGenChats.HelloOllamaWorldAsync(inferenceUrl, textModel).Wait());
-        Console.WriteLine("[6] AutoGen Hello Agents");
-        options.Add(6, () => AutoGenChats.HelloAgents(inferenceUrl, textModel).Wait());
+        Console.WriteLine("[7] DirectML Chat Completion");
+        options.Add(7, () => DirectML.Run(textModel: "directml-int4-awq-block-128"));
+
+        Console.WriteLine("[8] AutoGen Hello World");
+        options.Add(8, () => AutoGenChats.HelloOllamaWorldAsync(inferenceUrl, textModel).Wait());
+        Console.WriteLine("[9] AutoGen Hello Agents");
+        options.Add(9, () => AutoGenChats.HelloAgents(inferenceUrl, textModel).Wait());
         //https://microsoft.github.io/autogen-for-net/articles/Built-in-messages.html
 
         Console.WriteLine("[11] Semantic Kernel (SK) Hello World");
