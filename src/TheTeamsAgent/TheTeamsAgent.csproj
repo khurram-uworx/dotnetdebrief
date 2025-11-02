@@ -12,23 +12,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ModelContextProtocol" Version="0.4.0-preview.1" />
+    <PackageReference Include="ModelContextProtocol" Version="0.4.0-preview.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.65.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.66.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Teams.Api" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Teams.Apps" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Teams.Cards" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Teams.Common" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Teams.Extensions.Hosting" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Teams.Plugins.AspNetCore" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Teams.Plugins.AspNetCore.DevTools" Version="2.0.2" />
+    <PackageReference Include="Microsoft.Teams.Api" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Teams.Apps" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Teams.Cards" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Teams.Common" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Teams.Extensions.Hosting" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Teams.Plugins.AspNetCore" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Teams.Plugins.AspNetCore.DevTools" Version="2.0.3" />
   </ItemGroup>
 
 </Project>

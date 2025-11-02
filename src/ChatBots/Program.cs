@@ -44,6 +44,10 @@ static class Program
 
         Console.WriteLine("[4] Microsoft Agent Framework : Writer - Editor");
         options.Add(4, () => Agents.WriterEditorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
+        Console.WriteLine("[5] Microsoft Agent Framework : Slogan - Feedback Iterations");
+        options.Add(5, () => Agents.AgentWorkflowExecutorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
+        Console.WriteLine("[6] Microsoft Agent Framework : Human in Loop and Checkpoint");
+        options.Add(6, () => Agents.WorkflowHumanCheckpointAsync().Wait());
 
         Console.WriteLine("[7] DirectML Chat Completion");
         options.Add(7, () => DirectML.Run(textModel: "directml-int4-awq-block-128"));

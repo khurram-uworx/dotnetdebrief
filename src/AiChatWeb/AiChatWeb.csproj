@@ -10,13 +10,13 @@
   <ItemGroup>
 		<PackageReference Include="System.Linq.Async" Version="6.0.3" />
 
-		<PackageReference Include="Microsoft.Extensions.AI" Version="9.9.1" />
+		<PackageReference Include="Microsoft.Extensions.AI" Version="9.10.1" />
 		<PackageReference Include="Microsoft.Extensions.AI.Ollama" Version="9.7.0-preview.1.25356.2" />
-		<PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.65.0" />
-		<PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.65.0-preview" />
+		<PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.66.0" />
+		<PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.66.0-preview" />
 
-		<PackageReference Include="OllamaSharp" Version="5.4.7" />
-		<PackageReference Include="PdfPig" Version="0.1.12-alpha-20251002-c28d1" />
+		<PackageReference Include="OllamaSharp" Version="5.4.8" />
+		<PackageReference Include="PdfPig" Version="0.1.12-alpha-20251030-6ce69" />
   </ItemGroup>
 
 </Project>
