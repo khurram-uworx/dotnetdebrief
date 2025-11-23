@@ -29,10 +29,10 @@ class McpPlaywright
             Arguments = ["-y", "@playwright/mcp@latest"],
         });
 
-        await using var mcpClient = await McpClientFactory.CreateAsync(clientTransport)
+        await using var mcpClient = await McpClient.CreateAsync(clientTransport)
             .ConfigureAwait(false);
 
-        var tools = await mcpClient.EnumerateToolsAsync().ToListAsync();
+        var tools = await mcpClient.ListToolsAsync();
         foreach (var tool in tools)
             Console.WriteLine($"{tool.Name}: {tool.Description}");
 

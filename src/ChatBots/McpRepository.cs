@@ -40,11 +40,11 @@ class McpRepository
             Arguments = ["-y", "@modelcontextprotocol/server-github"],
         });
 
-        await using var mcpClient = await McpClientFactory.CreateAsync(clientTransport)
+        await using var mcpClient = await McpClient.CreateAsync(clientTransport)
             .ConfigureAwait(false);
 
         // Retrieve the list of tools available on the GitHub server
-        var tools = await mcpClient.EnumerateToolsAsync().ToListAsync();
+        var tools = await mcpClient.ListToolsAsync();
         foreach (var tool in tools)
             Console.WriteLine($"{tool.Name}: {tool.Description}");
 

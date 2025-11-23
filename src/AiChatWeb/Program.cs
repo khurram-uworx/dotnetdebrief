@@ -1,7 +1,8 @@
-using Microsoft.Extensions.AI;
 using AiChatWeb.Components;
 using AiChatWeb.Services;
 using AiChatWeb.Services.Ingestion;
+using Microsoft.Extensions.AI;
+using OllamaSharp;
 using Qdrant.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,18 +15,11 @@ var embeddingModel = builder.Configuration["AI__Ollama__EmbeddingModel"] ?? "all
 
 builder.Services.AddTransient<IChatClient>(sp =>
 {
-    return new OllamaChatClient(ollamaEndpoint, modelId: chatModel)
-        .AsBuilder()
-        .UseFunctionInvocation()
-        //.UseOpenTelemetry(configure: c =>
-        //    c.EnableSensitiveData = builder.Environment.IsDevelopment());
-        .Build();
+    return new OllamaApiClient(ollamaEndpoint, defaultModel: chatModel);
 });
 builder.Services.AddTransient<IEmbeddingGenerator>(sp =>
 {
-    return new OllamaEmbeddingGenerator(ollamaEndpoint, modelId: embeddingModel)
-        .AsBuilder()
-        .Build();
+    return new OllamaApiClient(ollamaEndpoint, defaultModel: embeddingModel);
 });
 builder.Services.AddSingleton<QdrantClient>(sp => new QdrantClient(qdrantEndpoint));
 
