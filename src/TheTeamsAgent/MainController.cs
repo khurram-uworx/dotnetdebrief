@@ -37,16 +37,13 @@ public class MainController
         if (this.initialized) return kernel;
 
         var clientTransport = new StreamClientTransport(EchoTool.ClientOutput, EchoTool.ClientInput);
-        var mcpClient = McpClientFactory.CreateAsync(clientTransport).Result;
-        var toolsList = new List<McpClientTool>();
-        
-        await foreach (var tool in mcpClient.EnumerateToolsAsync())
-        {
-            Console.WriteLine($"{tool.Name}: {tool.Description}");
-            toolsList.Add(tool);
-        }
+        var mcpClient = await McpClient.CreateAsync(clientTransport);
+        var tools = await mcpClient.ListToolsAsync();
 
-        this.kernel.Plugins.AddFromFunctions("sql", toolsList.Select(
+        foreach (var tool in tools)
+            Console.WriteLine($"{tool.Name}: {tool.Description}");
+
+        this.kernel.Plugins.AddFromFunctions("sql", tools.Select(
             aiFunction => aiFunction.AsKernelFunction()));
 
         this.initialized = true;

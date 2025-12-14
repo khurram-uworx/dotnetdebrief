@@ -79,10 +79,11 @@ class SloganWriterExecutor : Executor
 
     public SloganWriterExecutor(string id, IChatClient chatClient) : base(id)
     {
-        ChatClientAgentOptions agentOptions = new(instructions: "You are a professional slogan writer. You will be given a task to create a slogan.")
+        ChatClientAgentOptions agentOptions = new()
         {
             ChatOptions = new()
             {
+                Instructions = "You are a professional slogan writer. You will be given a task to create a slogan.",
                 ResponseFormat = ChatResponseFormat.ForJsonSchema<SloganResult>()
             }
         };
@@ -136,10 +137,11 @@ class FeedbackExecutor : Executor<SloganResult>
 
     public FeedbackExecutor(string id, IChatClient chatClient) : base(id)
     {
-        ChatClientAgentOptions agentOptions = new(instructions: "You are a professional editor. You will be given a slogan and the task it is meant to accomplish.")
+        ChatClientAgentOptions agentOptions = new()
         {
             ChatOptions = new()
             {
+                Instructions = "You are a professional editor. You will be given a slogan and the task it is meant to accomplish.",
                 ResponseFormat = ChatResponseFormat.ForJsonSchema<FeedbackResult>()
             }
         };

@@ -77,9 +77,9 @@ class Agents
             new ChatClientAgentOptions
             {
                 Name = "Writer",
-                Instructions = "Write stories that are engaging and creative.",
                 ChatOptions = new ChatOptions
                 {
+                    Instructions = "Write stories that are engaging and creative.",
                     Tools = [
                         AIFunctionFactory.Create(GetAuthor),
                         AIFunctionFactory.Create(FormatStory)
@@ -96,7 +96,10 @@ class Agents
             new ChatClientAgentOptions
             {
                 Name = "Editor",
-                Instructions = "Make the story more engaging, fix grammar, and enhance the plot."
+                ChatOptions = new ChatOptions
+                {
+                    Instructions = "Make the story more engaging, fix grammar, and enhance the plot."
+                }
             });
 
         Workflow workflow = AgentWorkflowBuilder.BuildSequential([writer, editor]);
