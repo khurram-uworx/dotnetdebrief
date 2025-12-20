@@ -1,18 +1,20 @@
 ﻿using Microsoft.ML.OnnxRuntimeGenAI;
-using System;
-using System.IO;
 
-namespace ChatBots;
+namespace Scenarios;
 
-static class DirectML
+static class DirectMLScenarios
 {
-    public static void Run(string textModel)
+    public static void Run(bool gpu, string textModel, bool npu = false)
     {
-        //string modelPath = @"C:\Users\khurram\.aitk\models\microsoft\Phi-3-mini-128k-instruct-onnx\directml\directml-int4-awq-block-128";
-        //string modelPath = @"C:\Users\khurram\.aitk\models\microsoft\Phi-3-mini-4k-instruct-onnx\cpu_and_mobile\cpu-int4-rtn-block-32-acc-level-4";
-        string modelPath = Path.Combine("Models", "directml", textModel);
+        string modelPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            "..", "..", "..", textModel));
         Console.Write("Loading model from " + modelPath + "...");
-        using Model model = new(modelPath);
+
+        var config = new Config(modelPath);
+        if (npu) config.AppendProvider("OpenVINO");
+        else if (gpu) config.AppendProvider("DML");
+
+        using Model model = new(config);//new(modelPath);
         Console.WriteLine("Done");
 
         using Tokenizer tokenizer = new(model);

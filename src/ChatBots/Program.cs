@@ -49,9 +49,6 @@ static class Program
         Console.WriteLine("[6] Microsoft Agent Framework : Human in Loop and Checkpoint");
         options.Add(6, () => Agents.WorkflowHumanCheckpointAsync().Wait());
 
-        Console.WriteLine("[7] DirectML Chat Completion");
-        options.Add(7, () => DirectML.Run(textModel: "directml-int4-awq-block-128"));
-
         Console.WriteLine("[8] AutoGen Hello World");
         options.Add(8, () => AutoGenChats.HelloOllamaWorldAsync(inferenceUrl, textModel).Wait());
         Console.WriteLine("[9] AutoGen Hello Agents");
