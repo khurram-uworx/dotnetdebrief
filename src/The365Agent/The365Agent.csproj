@@ -11,8 +11,8 @@
     <PackageReference Include="Microsoft.SemanticKernel.Agents.AzureAI" Version="1.68.0-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.68.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.68.0" />
-    <PackageReference Include="Microsoft.Agents.Authentication.Msal" Version="1.3.175" />
-    <PackageReference Include="Microsoft.Agents.Hosting.AspNetCore" Version="1.3.175" />
+    <PackageReference Include="Microsoft.Agents.Authentication.Msal" Version="1.3.176" />
+    <PackageReference Include="Microsoft.Agents.Hosting.AspNetCore" Version="1.3.176" />
   </ItemGroup>
 
   <!-- Exclude local settings from publish -->
