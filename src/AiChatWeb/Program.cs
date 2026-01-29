@@ -1,14 +1,24 @@
-using Microsoft.Extensions.AI;
-using OllamaSharp;
 using AiChatWeb.Components;
 using AiChatWeb.Services;
 using AiChatWeb.Services.Ingestion;
+using Microsoft.Extensions.AI;
+using OllamaSharp;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
+//var credential = new ApiKeyCredential(builder.Configuration["GitHubModels:Token"] ?? throw new InvalidOperationException("Missing configuration: GitHubModels:Token. See the README for details."));
+//var openAIOptions = new OpenAIClientOptions()
+//{
+//    Endpoint = new Uri("https://models.inference.ai.azure.com")
+//};
+
+//var ghModelsClient = new OpenAIClient(credential, openAIOptions);
+//var chatClient = ghModelsClient.GetChatClient("gpt-4o-mini").AsIChatClient();
+//var embeddingGenerator = ghModelsClient.GetEmbeddingClient("text-embedding-3-small").AsIEmbeddingGenerator();
+builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 IChatClient chatClient = new OllamaApiClient(new Uri("http://localhost:11434"),
-    "llama3.2");
+    "lfm2.5-thinking");
 IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator = new OllamaApiClient(new Uri("http://localhost:11434"),
     "all-minilm");
 
