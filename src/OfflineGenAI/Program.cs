@@ -37,7 +37,7 @@ else if (input == "12")
 else if (input == "13")
     DirectMLScenarios.Run(gpu: true, textModel: "cpu_and_mobile\\cpu-int4-rtn-block-32-acc-level-4", npu: true);
 else if (input == "21")
-    await new FoundryScenario().RunAsync();
+    await new FoundryScenarios().RunAsync();
 else
 {
     //var modelPath = "models/mistral-7b-instruct.Q4_K_M.gguf";

@@ -3,7 +3,7 @@ using Microsoft.AI.Foundry.Local;
 
 namespace Scenarios;
 
-class FoundryScenario
+class FoundryScenarios
 {
     //https://github.com/intel/Microsoft-Build2025-Samples/blob/main/FoundryLocalApp/Program.cs
 
@@ -12,7 +12,6 @@ class FoundryScenario
     public async Task RunAsync()
     {
         string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
         var config = new Configuration
         {
             AppName = "dotnetdebrief",
@@ -20,11 +19,9 @@ class FoundryScenario
             LogLevel = LogLevel.Information
         };
 
-
         // Initialize the singleton instance.
         await FoundryLocalManager.CreateAsync(config, Utils.GetAppLogger());
         var mgr = FoundryLocalManager.Instance;
-
 
         // Ensure that any Execution Provider (EP) downloads run and are completed.
         // EP packages include dependencies and may be large.
@@ -32,15 +29,9 @@ class FoundryScenario
         // For cross platform builds there is no dynamic EP download and this will return immediately.
         await Utils.RunWithSpinner("Registering execution providers", mgr.EnsureEpsDownloadedAsync());
 
-
-        // Get the model catalog
         var catalog = await mgr.GetCatalogAsync();
-
-
-        // Get a model using an alias.
         var model = await catalog.GetModelAsync("qwen2.5-0.5b") ?? throw new Exception("Model not found");
 
-        // Download the model (the method skips download if already cached)
         await model.DownloadAsync(progress =>
         {
             Console.Write($"\rDownloading model: {progress:F2}%");
@@ -50,21 +41,17 @@ class FoundryScenario
             }
         });
 
-        // Load the model
         Console.Write($"Loading model {model.Id}...");
         await model.LoadAsync();
         Console.WriteLine("done.");
 
-        // Get a chat client
         var chatClient = await model.GetChatClientAsync();
 
-        // Create a chat message
         List<ChatMessage> messages = new()
         {
             new ChatMessage { Role = "user", Content = "Why is the sky blue?" }
         };
 
-        // Get a streaming chat completion response
         Console.WriteLine("Chat completion response:");
         var streamingResponse = chatClient.CompleteChatStreamingAsync(messages, ct);
         await foreach (var chunk in streamingResponse)

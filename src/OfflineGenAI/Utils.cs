@@ -3,11 +3,11 @@ using System.Text;
 
 static class Utils
 {
-    private static readonly ILoggerFactory _loggerFactory;
+    static readonly ILoggerFactory loggerFactory;
 
     static Utils()
     {
-        _loggerFactory = LoggerFactory.Create(builder =>
+        loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(LogLevel.Information);
         });
@@ -33,7 +33,7 @@ static class Utils
     }
 
     public static ILogger GetAppLogger() =>
-        _loggerFactory.CreateLogger("FoundryLocalSamples");
+        loggerFactory.CreateLogger("FoundryLocalSamples");
 
     public static async Task RunWithSpinner<T>(string msg, T workTask, bool warnOnException = true) where T : Task
     {

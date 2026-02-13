@@ -4,7 +4,7 @@ using Tools;
 
 namespace Scenarios;
 
-public static class ToolAgentScenario
+public static class LLamaToolScenarios
 {
     public static async Task RunAsync(ILLamaExecutor executor)
     {
