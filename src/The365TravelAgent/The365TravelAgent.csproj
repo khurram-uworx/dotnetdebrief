@@ -9,12 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
-    <PackageReference Include="Azure.Identity" Version="1.17.1" />
+    <PackageReference Include="Azure.Identity" Version="1.19.0" />
     <PackageReference Include="AdaptiveCards" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Agents.AI" Version="1.0.0-preview.260212.1" />
-    <PackageReference Include="Microsoft.Agents.M365Copilot.Beta" Version="1.0.0-preview.7" />
-    <PackageReference Include="Microsoft.Extensions.AI" Version="10.3.0" />
-    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.3.0" />
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.0.0-rc4" />
+    <PackageReference Include="Microsoft.Agents.M365Copilot.Beta" Version="1.0.0-preview.14" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.4.0" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.4.0" />
     <PackageReference Include="Microsoft.Graph" Version="5.103.0" />
     <PackageReference Include="Microsoft.Agents.Authentication.Msal" Version="1.4.83" />
     <PackageReference Include="Microsoft.Agents.Hosting.AspNetCore" Version="1.4.83" />

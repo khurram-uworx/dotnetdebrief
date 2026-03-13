@@ -11,9 +11,9 @@
     <PackageReference Include="Intel.ML.OnnxRuntime.OpenVino" Version="1.24.1" />
     <PackageReference Include="LLamaSharp" Version="0.26.0" />
     <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.26.0" />
-    <PackageReference Include="Microsoft.AI.Foundry.Local" Version="0.8.2.1" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.12.1" />
-    <PackageReference Include="OpenAI" Version="2.8.0" />
+    <PackageReference Include="Microsoft.AI.Foundry.Local" Version="0.9.0" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.12.2" />
+    <PackageReference Include="OpenAI" Version="2.9.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="directml\directml-int4-awq-block-128\added_tokens.json">

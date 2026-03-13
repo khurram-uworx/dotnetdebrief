@@ -71,7 +71,7 @@ class Program
         {
             Messages = messages,
             MaxTokens = 2048,
-            Model = AnthropicModels.Claude35Sonnet,
+            Model = AnthropicModels.Claude45Sonnet,
             Stream = false,
             Temperature = 0m,
             Tools = tools,

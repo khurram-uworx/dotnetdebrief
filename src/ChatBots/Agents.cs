@@ -6,7 +6,6 @@ using OllamaSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChatBots;
@@ -31,18 +30,18 @@ class Agents
         while (true)
         {
             Console.Write(prompt);
-            
+
             string? input = Console.ReadLine();
             if (int.TryParse(input, out int value))
                 return value;
-            
+
             Console.WriteLine("Invalid input. Please enter a valid integer.");
         }
     }
-    
+
     static ExternalResponse handleExternalRequest(ExternalRequest request)
     {
-        var signal = request.DataAs<SignalWithNumber>();
+        var signal = request.Data.As<SignalWithNumber>();
 
         if (signal is not null)
         {
@@ -50,13 +49,13 @@ class Agents
             {
                 case NumberSignal.Init:
                     int initialGuess = getIntegerFromHuman("Please provide your initial guess: ");
-                    return request.CreateResponse(initialGuess);
+                    return new ExternalResponse(request.PortInfo, request.RequestId, new PortableValue(initialGuess));
                 case NumberSignal.Above:
                     int lowerGuess = getIntegerFromHuman($"You previously guessed {signal.Number} too large. Please provide a new guess: ");
-                    return request.CreateResponse(lowerGuess);
+                    return new ExternalResponse(request.PortInfo, request.RequestId, new PortableValue(lowerGuess));
                 case NumberSignal.Below:
                     int higherGuess = getIntegerFromHuman($"You previously guessed {signal.Number} too small. Please provide a new guess: ");
-                    return request.CreateResponse(higherGuess);
+                    return new ExternalResponse(request.PortInfo, request.RequestId, new PortableValue(higherGuess));
             }
         }
 
@@ -86,8 +85,8 @@ class Agents
                     ]
                 }
             });
-        
-        AgentRunResponse response = await writer.RunAsync(prompt);
+
+        var response = await writer.RunAsync(prompt);
         Console.WriteLine("Single Agent Response:");
         Console.WriteLine(response.Text);
 
@@ -103,8 +102,8 @@ class Agents
             });
 
         Workflow workflow = AgentWorkflowBuilder.BuildSequential([writer, editor]);
-        AIAgent workflowAgent = workflow.AsAgent();
-        AgentRunResponse workflowResponse = await workflowAgent.RunAsync(prompt);
+        AIAgent workflowAgent = workflow.AsAIAgent();
+        var workflowResponse = await workflowAgent.RunAsync(prompt);
 
         Console.WriteLine("\n\n\nWorkflow Response:");
         Console.WriteLine(workflowResponse.Text);
@@ -122,14 +121,14 @@ class Agents
 
             .AddEdge(sloganWriter, feedbackProvider)
             .AddEdge(feedbackProvider, sloganWriter)
-            
+
             .WithOutputFrom(feedbackProvider)
             .Build();
 
-        await using StreamingRun run = await InProcessExecution.StreamAsync(workflow,
+        StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow,
             input: "Create a slogan for a new electric SUV that is affordable and " +
             "fun to drive.");
-        
+
         await foreach (WorkflowEvent evt in run.WatchStreamAsync())
         {
             if (evt is SloganGeneratedEvent or FeedbackEvent) // Custom events to allow us to monitor the progress of the workflow.
@@ -148,16 +147,17 @@ class Agents
         var checkpointManager = CheckpointManager.Default;
         var checkpoints = new List<CheckpointInfo>();
 
-        await using Checkpointed<StreamingRun> checkpointedRun = await InProcessExecution
-            .StreamAsync(workflow, new SignalWithNumber(NumberSignal.Init), checkpointManager);
+        StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow,
+            new SignalWithNumber(NumberSignal.Init),
+            checkpointManager);
 
-        await foreach (WorkflowEvent evt in checkpointedRun.Run.WatchStreamAsync())
+        await foreach (WorkflowEvent evt in run.WatchStreamAsync())
         {
             switch (evt)
             {
                 case RequestInfoEvent requestInputEvt:
                     ExternalResponse response = handleExternalRequest(requestInputEvt.Request);
-                    await checkpointedRun.Run.SendResponseAsync(response);
+                    await run.SendResponseAsync(response);
                     break;
                 case ExecutorCompletedEvent executorCompletedEvt:
                     Console.WriteLine($"* Executor {executorCompletedEvt.ExecutorId} completed.");
@@ -185,16 +185,16 @@ class Agents
         const int CheckpointIndex = 1;
         Console.WriteLine($"\n\nRestoring from the {CheckpointIndex + 1}th checkpoint.");
         CheckpointInfo savedCheckpoint = checkpoints[CheckpointIndex];
-        
-        await checkpointedRun.RestoreCheckpointAsync(savedCheckpoint, CancellationToken.None); // Note that we are restoring the state directly to the same run instance.
-        await foreach (WorkflowEvent evt in checkpointedRun.Run.WatchStreamAsync())
+
+        StreamingRun restoredRun = await InProcessExecution.ResumeStreamingAsync(workflow, savedCheckpoint, checkpointManager);
+        await foreach (WorkflowEvent evt in restoredRun.WatchStreamAsync())
         {
             switch (evt)
             {
                 case RequestInfoEvent requestInputEvt:
                     // Handle `RequestInfoEvent` from the workflow
                     ExternalResponse response = handleExternalRequest(requestInputEvt.Request);
-                    await checkpointedRun.Run.SendResponseAsync(response);
+                    await restoredRun.SendResponseAsync(response);
                     break;
                 case ExecutorCompletedEvent executorCompletedEvt:
                     Console.WriteLine($"* Executor {executorCompletedEvt.ExecutorId} completed.");

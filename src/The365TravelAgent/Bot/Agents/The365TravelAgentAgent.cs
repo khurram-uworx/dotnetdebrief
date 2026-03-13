@@ -61,7 +61,7 @@ public class The365TravelAgentAgent
         var retrievalPlugin = new RetrievalPlugin(app, turnContext);
         tools.Add(AIFunctionFactory.Create(retrievalPlugin.BuildRetrievalAsync));
 
-        agent = chatClient.CreateAIAgent(instructions: AgentInstructions, tools: tools);
+        agent = chatClient.AsAIAgent(instructions: AgentInstructions, tools: tools);
     }
 
     /// <summary>
@@ -73,11 +73,11 @@ public class The365TravelAgentAgent
     public async Task<TravelAgentResponse> InvokeAgentAsync(string input, IList<ChatMessage> chatHistory)
     {
         ArgumentNullException.ThrowIfNull(chatHistory);
-        AgentThread thread = agent.GetNewThread();
+        AgentSession session = await agent.CreateSessionAsync();
         ChatMessage message = new(ChatRole.User, input);
         chatHistory.Add(message);
 
-        AgentRunResponse agentResponse = await agent.RunAsync(chatHistory, thread);
+        var agentResponse = await agent.RunAsync(chatHistory, session);
 
         var responseMessage = new ChatMessage(ChatRole.Assistant, agentResponse.Text);
         chatHistory.Add(responseMessage);
