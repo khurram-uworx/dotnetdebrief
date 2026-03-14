@@ -48,6 +48,8 @@ static class Program
         options.Add(5, () => Agents.AgentWorkflowExecutorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
         Console.WriteLine("[6] Microsoft Agent Framework : Human in Loop and Checkpoint");
         options.Add(6, () => Agents.WorkflowHumanCheckpointAsync().Wait());
+        Console.WriteLine("[7] Copilot: Weather Tool");
+        options.Add(7, () => Agents.CopilotAgentWithToolsAsync().Wait());
 
         Console.WriteLine("[8] AutoGen Hello World");
         options.Add(8, () => AutoGenChats.HelloOllamaWorldAsync(inferenceUrl, textModel).Wait());

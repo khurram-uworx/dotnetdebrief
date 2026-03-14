@@ -1,4 +1,5 @@
 ﻿using AgentFramework;
+using GitHub.Copilot.SDK;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
@@ -204,5 +205,51 @@ class Agents
                     break;
             }
         }
+    }
+
+    public static async Task CopilotAgentWithToolsAsync()
+    {
+        //https://github.com/github/copilot-sdk/blob/main/docs/integrations/microsoft-agent-framework.md
+        // Define a custom tool
+        AIFunction weatherTool = AIFunctionFactory.Create(
+            (string location) => $"The weather in {location} is sunny with a high of 25°C.",
+            "GetWeather",
+            "Get the current weather for a given location."
+        );
+
+        await using var copilotClient = new CopilotClient();
+        await copilotClient.StartAsync();
+
+        //var done = new TaskCompletionSource(); // we can await done.Task;
+        //copilotClient.On(evt =>
+        //{
+        //    //if (evt is AssistantMessageEvent msg)
+        //    //    Console.WriteLine(msg.Data.Content);
+        //    if (evt is SessionIdleEvent)
+        //        done.SetResult();
+        //});
+
+        var sessionConfig = new SessionConfig
+        {
+            OnPermissionRequest = (req, inv) =>
+            {
+                Console.WriteLine($"\n[Permission Request: {req.Kind}]");
+
+                //Console.Write("Approve? (y/n): ");
+                //string? input = Console.ReadLine()?.Trim().ToUpperInvariant();
+                //string kind = input is "Y" or "YES" ? "approved" : "denied-interactively-by-user";
+
+                return Task.FromResult(new PermissionRequestResult()
+                {
+                    Kind = PermissionRequestResultKind.Approved
+                });
+            },
+            Tools = [weatherTool]
+        };
+
+        AIAgent agent = copilotClient.AsAIAgent(sessionConfig);
+        var response = await agent.RunAsync("What's the weather like in Faisalabad?");
+        
+        Console.WriteLine(response);
     }
 }
