@@ -1,0 +1,14 @@
+{
+	"mcpServers": {
+		"SampleMcpServer": {
+			"type": "stdio",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"E:\\src\\trainings\\uworx\\uworx-dotnetdebrief\\src\\McpServers\\McpServers.csproj"
+			]
+		}
+	},
+	"inputs": []
+}
