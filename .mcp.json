@@ -6,7 +6,7 @@
 			"args": [
 				"run",
 				"--project",
-				"E:\\src\\trainings\\uworx\\uworx-dotnetdebrief\\src\\McpServers\\McpServers.csproj"
+				".\\src\\McpServers\\McpServers.csproj"
 			]
 		}
 	},
