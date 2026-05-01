@@ -72,6 +72,8 @@ static class Program
         options.Add(21, () => AIExtensions.StructuredOutputAsync(inferenceUrl, textModel).Wait());
         Console.WriteLine("[22] AI Extensions Function Calling");
         options.Add(22, () => AIExtensions.FunctionCallingAsync(inferenceUrl, textModel).Wait());
+        Console.WriteLine("[23] Chess");
+        options.Add(23, () => AIExtensions.PlayChessAsync(urlOllama, textModel).Wait());
         //Console.WriteLine("[23] AI Extensions Chat Completition and Tool");
         //options.Add(23, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
 

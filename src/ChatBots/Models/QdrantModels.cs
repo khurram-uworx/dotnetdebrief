@@ -21,6 +21,6 @@ class Movie
     [VectorStoreData]
     public string Description { get; set; }
 
-    [VectorStoreVector(Dimensions: 384, DistanceFunction = DistanceFunction.CosineSimilarity)]
+    [VectorStoreVector(dimensions: 384, DistanceFunction = DistanceFunction.CosineSimilarity)]
     public ReadOnlyMemory<float> Vector { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.AI;
+﻿using Chess;
+using Microsoft.Extensions.AI;
 using OllamaSharp;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,27 @@ static class AIExtensions
 {
     enum Sentiment { Positive, Negative, Neutral }
     record SentimentRecord(string ResponseText, Sentiment ReviewSentiment);
+
+    static async Task<string?> getGptMoveAsync(string urlOllama, string textModel, ChessBoard board, string previousInvalidMove = null)
+    {
+        IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), textModel);
+        var messages = new List<ChatMessage>
+        {
+            new(ChatRole.System, """
+            You are a chess engine. Respond only with the best move in UCI format
+            - for pawn its a good idea to use from-to format like e2e4
+            - for other pieces use piece destination format like nd2 to move n to d2"
+            """)
+        };
+
+        if (previousInvalidMove != null)
+            messages.Add(new(ChatRole.System, $"Your previously suggested move {previousInvalidMove} was invalid. Please suggest a valid move."));
+
+        messages.Add(new(ChatRole.User, $"Its your turn now, you are Black, Current board FEN: {board.ToFen()}"));
+
+        var response = await chatClient.GetResponseAsync(messages);
+        return response is not null && !string.IsNullOrWhiteSpace(response.Text) ? response.Text.Trim() : null;
+    }
 
     public static async Task StructuredOutputAsync(string urlOllama, string textModel)
     {
@@ -72,5 +94,58 @@ static class AIExtensions
 
         ChatResponse response = await client.GetResponseAsync(chatHistory, chatOptions);
         Console.WriteLine($"Assistant >>> {response.Text}");
+    }
+
+    public static async Task PlayChessAsync(string urlOllama, string textModel)
+    {
+        var board = new ChessBoard();
+        bool playerIsWhite = true;
+
+        Console.WriteLine("Welcome to AI Chess!");
+
+        while (!board.IsEndGame)
+        {
+            Console.WriteLine(board.ToAscii());
+
+            if ((board.Turn == PieceColor.White && playerIsWhite) ||
+                (board.Turn == PieceColor.Black && !playerIsWhite))
+            {
+                Console.Write("Your move (e.g., e2e4): ");
+                string? moveInput = Console.ReadLine()?.Trim();
+
+                if (string.IsNullOrWhiteSpace(moveInput) || !board.IsValidMove(moveInput))
+                {
+                    Console.WriteLine("Invalid move. Try again.");
+                    continue;
+                }
+
+                board.Move(moveInput);
+            }
+            else
+            {
+            thinking:
+                string previousInvalidMove = null;
+                Console.WriteLine("thinking...");
+                string? aiMove = await getGptMoveAsync(urlOllama, textModel, board);
+
+                if (!string.IsNullOrWhiteSpace(aiMove))
+                {
+                    previousInvalidMove = aiMove;
+                    Console.WriteLine($"AI plays: {aiMove}");
+
+                    if (board.IsValidMove(aiMove))
+                        board.Move(aiMove);
+                    else
+                        goto thinking;
+                }
+                else
+                {
+                    Console.WriteLine("GPT suggested an invalid move. Stopping game.");
+                    break;
+                }
+            }
+        }
+
+        Console.WriteLine("Game Over!");
     }
 }

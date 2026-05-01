@@ -27,7 +27,7 @@ class FoundryScenarios
         // EP packages include dependencies and may be large.
         // Download is only required again if a new version of the EP is released.
         // For cross platform builds there is no dynamic EP download and this will return immediately.
-        await Utils.RunWithSpinner("Registering execution providers", mgr.EnsureEpsDownloadedAsync());
+        await Utils.RunWithSpinner("Registering execution providers", mgr.DownloadAndRegisterEpsAsync());
 
         var catalog = await mgr.GetCatalogAsync();
         var model = await catalog.GetModelAsync("qwen2.5-0.5b") ?? throw new Exception("Model not found");
