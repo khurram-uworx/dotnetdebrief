@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatBots.Acp;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -50,12 +51,8 @@ static class Program
         options.Add(6, () => Agents.WorkflowHumanCheckpointAsync().Wait());
         Console.WriteLine("[7] Copilot: Custom Tool");
         options.Add(7, () => Agents.CopilotAgentWithToolsAsync().Wait());
-
-        Console.WriteLine("[8] AutoGen Hello World");
-        options.Add(8, () => AutoGenChats.HelloOllamaWorldAsync(inferenceUrl, textModel).Wait());
-        Console.WriteLine("[9] AutoGen Hello Agents");
-        options.Add(9, () => AutoGenChats.HelloAgents(inferenceUrl, textModel).Wait());
-        //https://microsoft.github.io/autogen-for-net/articles/Built-in-messages.html
+        Console.WriteLine("[8] Copilot: ACP");
+        options.Add(8, () => AcpLauncher.CopilotAcpAsync().Wait());
 
         Console.WriteLine("[11] Semantic Kernel (SK) Hello World");
         options.Add(11, () => SemanticKernelChats.HelloWorldAsync(inferenceUrl, textModel).Wait());
@@ -65,8 +62,14 @@ static class Program
         options.Add(13, () => SemanticKernelChats.LightsPluginAsync(inferenceUrl, textModel).Wait());
         Console.WriteLine("[14] SK Jira Plugin");
         options.Add(14, () => SemanticKernelChats.JiraPluginAsync(inferenceUrl, textModel).Wait());
-        Console.WriteLine("[19] SK RAG Scenario");
-        options.Add(19, () => SemanticKernelChats.RagScenarioAsync(inferenceUrl, textModel).Wait());
+        Console.WriteLine("[15] SK RAG Scenario");
+        options.Add(15, () => SemanticKernelChats.RagScenarioAsync(inferenceUrl, textModel).Wait());
+
+        Console.WriteLine("[18] AutoGen Hello World");
+        options.Add(18, () => AutoGenChats.HelloOllamaWorldAsync(inferenceUrl, textModel).Wait());
+        Console.WriteLine("[19] AutoGen Hello Agents");
+        options.Add(19, () => AutoGenChats.HelloAgents(inferenceUrl, textModel).Wait());
+        //https://microsoft.github.io/autogen-for-net/articles/Built-in-messages.html
 
         Console.WriteLine("[21] AI Extensions Structured Output");
         options.Add(21, () => AIExtensions.StructuredOutputAsync(inferenceUrl, textModel).Wait());
