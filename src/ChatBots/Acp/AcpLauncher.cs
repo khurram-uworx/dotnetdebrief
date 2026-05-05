@@ -8,9 +8,10 @@ namespace ChatBots.Acp;
 
 static class AcpLauncher
 {
-    public static async Task CopilotAcpAsync()
+    public static async Task LaunchCodingAgentAsync()
     {
         //https://github.blog/changelog/2026-01-28-acp-support-in-copilot-cli-is-now-in-public-preview/
+        // Copilot agent can be launched with acp server listening on port instead of STDIO
         //using var copilotClient = new TcpClient("localhost", 8080);
         //NetworkStream stream = copilotClient.GetStream();
         //TextReader reader = new StreamReader(stream);
@@ -20,10 +21,9 @@ static class AcpLauncher
         {
             StartInfo = new ProcessStartInfo
             {
-                //FileName = "gemini",
-                //Arguments = "--experimental-acp",
-                FileName = "copilot",
-                Arguments = "--acp",
+                //FileName = "gemini", Arguments = "--experimental-acp",
+                FileName = "copilot", Arguments = "--acp",
+                // opencode installs as cmd / bat file on Windows, watch out for that
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
@@ -34,9 +34,7 @@ static class AcpLauncher
         try
         {
             if (!process.Start())
-            {
                 throw new Exception("Failed to start agent proccess");
-            }
 
             var client = new ExampleClient();
             var connection = new ClientSideConnection(_ => client, process.StandardOutput, process.StandardInput);

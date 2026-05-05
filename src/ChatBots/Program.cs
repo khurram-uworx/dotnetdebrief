@@ -52,7 +52,7 @@ static class Program
         Console.WriteLine("[7] Copilot: Custom Tool");
         options.Add(7, () => Agents.CopilotAgentWithToolsAsync().Wait());
         Console.WriteLine("[8] Copilot: ACP");
-        options.Add(8, () => AcpLauncher.CopilotAcpAsync().Wait());
+        options.Add(8, () => AcpLauncher.LaunchCodingAgentAsync().Wait());
 
         Console.WriteLine("[11] Semantic Kernel (SK) Hello World");
         options.Add(11, () => SemanticKernelChats.HelloWorldAsync(inferenceUrl, textModel).Wait());

@@ -12,9 +12,10 @@ class ExampleClient : IAcpClient
     {
         var toolCallElement = (JsonElement)request.ToolCall;
         var title = toolCallElement.GetProperty("title").GetString() ?? "Unknown";
-        Console.WriteLine($"\n🔐 Permission requested: {title}");
 
+        Console.WriteLine($"\n🔐 Permission requested: {title}");
         Console.WriteLine("\nOptions:");
+        
         for (int i = 0; i < request.Options.Length; i++)
         {
             var option = request.Options[i];
@@ -33,9 +34,7 @@ class ExampleClient : IAcpClient
                 };
             }
             else
-            {
                 Console.WriteLine("Invalid option. Please try again.");
-            }
         }
     }
 
@@ -46,13 +45,9 @@ class ExampleClient : IAcpClient
         {
             case AgentMessageChunkSessionUpdate agentMessage:
                 if (agentMessage.Content is TextContentBlock text)
-                {
                     Console.Write(text.Text);
-                }
                 else
-                {
                     Console.WriteLine($"[{agentMessage.Content.GetType().Name}]");
-                }
                 break;
             case ToolCallSessionUpdate toolCall:
                 Console.WriteLine($"\n🔧 {toolCall.Title} ({toolCall.Status})");
@@ -82,11 +77,20 @@ class ExampleClient : IAcpClient
         return new ReadTextFileResponse { Content = "Mock file content" };
     }
 
-    public ValueTask<CreateTerminalResponse> CreateTerminalAsync(CreateTerminalRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    public ValueTask<TerminalOutputRequest> TerminalOutputAsync(TerminalOutputRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    public ValueTask<ReleaseTerminalResponse> ReleaseTerminalAsync(ReleaseTerminalRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    public ValueTask<WaitForTerminalExitResponse> WaitForTerminalExitAsync(WaitForTerminalExitRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    public ValueTask<KillTerminalCommandResponse> KillTerminalCommandAsync(KillTerminalCommandRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    public ValueTask<JsonElement> ExtMethodAsync(string method, JsonElement request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    public ValueTask ExtNotificationAsync(string method, JsonElement notification, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public ValueTask<CreateTerminalResponse> CreateTerminalAsync(CreateTerminalRequest request, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+    public ValueTask<TerminalOutputRequest> TerminalOutputAsync(TerminalOutputRequest request, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+    public ValueTask<ReleaseTerminalResponse> ReleaseTerminalAsync(ReleaseTerminalRequest request, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+    public ValueTask<WaitForTerminalExitResponse> WaitForTerminalExitAsync(WaitForTerminalExitRequest request,
+        CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+    public ValueTask<KillTerminalCommandResponse> KillTerminalCommandAsync(KillTerminalCommandRequest request,
+        CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+    public ValueTask<JsonElement> ExtMethodAsync(string method, JsonElement request, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
+    public ValueTask ExtNotificationAsync(string method, JsonElement notification, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException();
 }
