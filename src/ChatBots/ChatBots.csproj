@@ -66,7 +66,7 @@
     <PackageReference Include="AutoGen" Version="0.2.3" />
     <PackageReference Include="Dapplo.Jira" Version="2.0.7" />
     <PackageReference Include="Gera.Chess" Version="1.2.0" />
-    <PackageReference Include="GitHub.Copilot.SDK" Version="1.0.4" />
+    <PackageReference Include="GitHub.Copilot.SDK" Version="1.0.0" />
     <PackageReference Include="Microsoft.Agents.AI" Version="1.11.1" />
     <PackageReference Include="Microsoft.Agents.AI.GitHub.Copilot" Version="1.11.1-rc1" />
     <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.11.1" />

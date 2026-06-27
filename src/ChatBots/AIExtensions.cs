@@ -13,9 +13,8 @@ static class AIExtensions
     enum Sentiment { Positive, Negative, Neutral }
     record SentimentRecord(string ResponseText, Sentiment ReviewSentiment);
 
-    static async Task<string?> getGptMoveAsync(string urlOllama, string textModel, ChessBoard board, string previousInvalidMove = null)
+    static async Task<string?> getGptMoveAsync(IChatClient chatClient, ChessBoard board, string previousInvalidMove = null)
     {
-        IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), textModel);
         var messages = new List<ChatMessage>
         {
             new(ChatRole.System, """
@@ -96,7 +95,7 @@ static class AIExtensions
         Console.WriteLine($"Assistant >>> {response.Text}");
     }
 
-    public static async Task PlayChessAsync(string urlOllama, string textModel)
+    public static async Task PlayChessAsync(IChatClient chatClient)
     {
         var board = new ChessBoard();
         bool playerIsWhite = true;
@@ -126,7 +125,7 @@ static class AIExtensions
             thinking:
                 string previousInvalidMove = null;
                 Console.WriteLine("thinking...");
-                string? aiMove = await getGptMoveAsync(urlOllama, textModel, board);
+                string? aiMove = await getGptMoveAsync(chatClient, board);
 
                 if (!string.IsNullOrWhiteSpace(aiMove))
                 {

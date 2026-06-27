@@ -1,4 +1,5 @@
 ﻿using ChatBots.Acp;
+using ChatBots.OpenCode;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ static class Program
         Console.WriteLine("[6] Microsoft Agent Framework : Human in Loop and Checkpoint");
         options.Add(6, () => Agents.WorkflowHumanCheckpointAsync().Wait());
         Console.WriteLine("[7] Copilot: Custom Tool");
-        options.Add(7, () => Agents.CopilotAgentWithToolsAsync().Wait());
+        options.Add(7, () => CopilotAgents.CopilotAgentWithToolsAsync().Wait());
         Console.WriteLine("[8] Copilot: ACP");
         options.Add(8, () => AcpLauncher.LaunchCodingAgentAsync().Wait());
 
@@ -75,10 +76,14 @@ static class Program
         options.Add(21, () => AIExtensions.StructuredOutputAsync(inferenceUrl, textModel).Wait());
         Console.WriteLine("[22] AI Extensions Function Calling");
         options.Add(22, () => AIExtensions.FunctionCallingAsync(inferenceUrl, textModel).Wait());
-        Console.WriteLine("[23] Chess");
-        options.Add(23, () => AIExtensions.PlayChessAsync(urlOllama, textModel).Wait());
-        //Console.WriteLine("[23] AI Extensions Chat Completition and Tool");
-        //options.Add(23, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
+        Console.WriteLine("[23] OpenCode");
+        options.Add(23, () => OpenCodeExamples.StreamingAsync().Wait());
+        Console.WriteLine("[24] Chess /w OpenCode");
+        //urlOllama, textModel
+        //        //IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), textModel);
+        options.Add(24, () => AIExtensions.PlayChessAsync(new OpenCodeChatClient(new OpenCodeClient())).Wait());
+        //Console.WriteLine("[25] AI Extensions Chat Completition and Tool");
+        //options.Add(25, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
 
         Console.WriteLine("[31] SK Agents - Ticket Handler");
         options.Add(31, () =>
