@@ -1,0 +1,6 @@
+[mcp_servers.microsoft-learn]
+url = "https://learn.microsoft.com/api/mcp"
+
+[mcp_servers.code-memory]
+command = "npx"
+args = ["-y", "@uworx/code-memory"]
