@@ -81,7 +81,7 @@ static class Program
         Console.WriteLine("[24] Chess /w OpenCode");
         //urlOllama, textModel
         //        //IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), textModel);
-        options.Add(24, () => AIExtensions.PlayChessAsync(new OpenCodeChatClient(new OpenCodeClient())).Wait());
+        options.Add(24, () => OpenCodeExamples.PlayChessAsync(new OpenCodeChatClient(new OpenCodeClient())).Wait());
         //Console.WriteLine("[25] AI Extensions Chat Completition and Tool");
         //options.Add(25, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
 
@@ -139,7 +139,7 @@ static class Program
             
             Use structured steps with Playwright MCP and return a list of results sorted by price ascending
             """).Wait());
-            //"Browse to https://uworx.webhr.co/jobs/home using the Playwright tool and then summarize currently opened jobs you find on that web page").Wait());
+        //"Browse to https://uworx.webhr.co/jobs/home using the Playwright tool and then summarize currently opened jobs you find on that web page").Wait());
 
         Console.WriteLine();
         Console.WriteLine("Run Qdrant first; docker run --rm -p 6333:6333 -p 6334:6334 qdrant/qdrant");

@@ -3,7 +3,6 @@
 
 using ChatBots.Helpers;
 using ChatBots.Plugins;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -92,7 +91,7 @@ Give me a TLDR with the fewest words.";
         var chatCompletionService = kernel.Services.GetRequiredService<IChatCompletionService>();
 
         if (null != attach) attach(kernel);
-        
+
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {
             //ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions, // this cant be used together with FunctionChoiceBehavior

@@ -13,9 +13,15 @@ using System.Threading.Tasks;
 
 namespace ChatBots.OpenCode;
 
-public readonly record struct ServerSentEvent(string Type, string? Delta, bool IsIdle, string? SessionId);
+readonly record struct ServerSentEvent(string Type, string? Delta, bool IsIdle, string? SessionId);
 
-public class OpenCodeClient : IDisposable
+record CreateSessionRequest
+{
+    [JsonPropertyName("title")]
+    public string? Title { get; init; }
+}
+
+class OpenCodeClient : IDisposable
 {
     static ServerSentEvent parseEvent(string json)
     {

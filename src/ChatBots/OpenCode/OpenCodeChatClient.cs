@@ -3,13 +3,88 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ChatBots.OpenCode;
 
-public class OpenCodeChatClient : IChatClient
+record PartInput
+{
+    [JsonPropertyName("type")]
+    public string Type { get; init; } = "";
+
+    [JsonPropertyName("text")]
+    public string? Text { get; init; }
+
+    public static PartInput TextInput(string text) => new() { Type = "text", Text = text };
+}
+
+record ModelReference
+{
+    [JsonPropertyName("providerID")]
+    public string ProviderId { get; init; } = "";
+
+    [JsonPropertyName("modelID")]
+    public string ModelId { get; init; } = "";
+}
+
+record SendMessageRequest
+{
+    [JsonPropertyName("parts")]
+    public List<PartInput> Parts { get; init; } = [];
+
+    [JsonPropertyName("model")]
+    public ModelReference? Model { get; init; }
+}
+
+record Part
+{
+    [JsonPropertyName("type")]
+    public string Type { get; init; } = "";
+
+    [JsonPropertyName("text")]
+    public string? Text { get; init; }
+}
+
+record MessageTime
+{
+    [JsonPropertyName("created")]
+    public long Created { get; init; }
+}
+
+record MessageInfo
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; init; }
+
+    [JsonPropertyName("role")]
+    public string? Role { get; init; }
+
+    [JsonPropertyName("time")]
+    public MessageTime? Time { get; init; }
+}
+
+record MessageWithParts
+{
+    [JsonPropertyName("info")]
+    public MessageInfo? Message { get; init; }
+
+    [JsonPropertyName("parts")]
+    public List<Part>? Parts { get; init; }
+}
+
+record SessionRecord
+{
+    [JsonPropertyName("id")]
+    public required string Id { get; init; }
+
+    [JsonPropertyName("directory")]
+    public string? Directory { get; init; }
+}
+
+class OpenCodeChatClient : IChatClient
 {
     static SendMessageRequest buildRequest(IEnumerable<ChatMessage> chatMessages)
     {
@@ -60,7 +135,7 @@ public class OpenCodeChatClient : IChatClient
         Metadata = new ChatClientMetadata("OpenCode", new Uri(client.BaseUrl), "opencode");
     }
 
-    async Task<SessionRecord> EnsureSessionAsync(CancellationToken ct)
+    async Task<SessionRecord> ensureSessionAsync(CancellationToken ct)
     {
         if (sessionId is null)
         {
@@ -94,7 +169,7 @@ public class OpenCodeChatClient : IChatClient
         ChatOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var session = await EnsureSessionAsync(cancellationToken);
+        var session = await ensureSessionAsync(cancellationToken);
         var request = buildRequest(chatMessages);
         var response = await client.SendMessageAsync(session.Id, request, cancellationToken);
         return toChatResponse(response);
@@ -105,7 +180,7 @@ public class OpenCodeChatClient : IChatClient
         ChatOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var session = await EnsureSessionAsync(cancellationToken);
+        var session = await ensureSessionAsync(cancellationToken);
         var request = buildRequest(chatMessages);
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);

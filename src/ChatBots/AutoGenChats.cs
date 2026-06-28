@@ -1,9 +1,9 @@
 ﻿using AutoGen;
 using AutoGen.Core;
-using System.Net.Http;
-using System;
 using AutoGen.Ollama;
 using AutoGen.Ollama.Extension;
+using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ChatBots;
@@ -92,7 +92,7 @@ If the answer is wrong, you ask student to fix it.")
                     //}
 
                     return reply;
-                    
+
                     //var list = new List<TextMessage>();
                     //foreach(var msg in msgs)
                     //{

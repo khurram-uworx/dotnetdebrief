@@ -23,7 +23,7 @@ static class OpenAI
                 new UserChatMessage("What is the golden ratio?")
             ], new ChatCompletionOptions
             {
-                Temperature = 0.7f 
+                Temperature = 0.7f
             }
             ).Value;
 

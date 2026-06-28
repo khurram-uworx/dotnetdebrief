@@ -23,7 +23,7 @@ class KernelMemoryPgRagSK
     {
         using var connection = new NpgsqlConnection(connectionString);
         using var command = new NpgsqlCommand();
-        
+
         connection.Open();
         command.Connection = connection;
         command.CommandText = $"SELECT EXISTS(SELECT datname FROM pg_catalog.pg_database WHERE datname = '{databaseName}');";

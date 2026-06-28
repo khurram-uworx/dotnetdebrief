@@ -31,9 +31,9 @@ static class AIExtensionTools
 
         // https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.AI.Ollama
         IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), textModel);
-            //.AsBuilder()
-            //.UseFunctionInvocation()
-            //.Build();
+        //.AsBuilder()
+        //.UseFunctionInvocation()
+        //.Build();
 
         //Console.WriteLine(await chatClient.CompleteAsync("Do I need an umbrella?",
         //    options: new ChatOptions
@@ -89,6 +89,6 @@ static class AIExtensionTools
         {
             Console.WriteLine("Couldnt figure out");
             Console.WriteLine(response);
-        }    
+        }
     }
 }

@@ -4,16 +4,11 @@
 
 using ChatBots.Helpers;
 using ChatBots.Models;
-using ChatBots.Plugins;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Data;
-using Microsoft.SemanticKernel.Embeddings;
-using Microsoft.SemanticKernel.Memory;
-using Microsoft.SemanticKernel.Plugins.Memory;
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 using OllamaSharp;
 using System;
@@ -160,7 +155,7 @@ static class QdrantSemanticKernel
         {
             // https://learn.microsoft.com/en-us/semantic-kernel/concepts/text-search/text-search-vector-stores
             var textSearch = new VectorStoreTextSearch<Movie>(vectorizedSearch, textEmbeddingGenerator);//, new OllamaTextEmbeddingService(
-                //textEmbeddingGenerator as OllamaEmbeddingGenerator));
+                                                                                                        //textEmbeddingGenerator as OllamaEmbeddingGenerator));
             var searchPlugin = textSearch.CreateWithGetTextSearchResults("SearchPlugin");
             kernel.Plugins.Add(searchPlugin);
 

@@ -15,7 +15,7 @@ class ExampleClient : IAcpClient
 
         Console.WriteLine($"\n🔐 Permission requested: {title}");
         Console.WriteLine("\nOptions:");
-        
+
         for (int i = 0; i < request.Options.Length; i++)
         {
             var option = request.Options[i];

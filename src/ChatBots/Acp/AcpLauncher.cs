@@ -22,7 +22,8 @@ static class AcpLauncher
             StartInfo = new ProcessStartInfo
             {
                 //FileName = "gemini", Arguments = "--experimental-acp",
-                FileName = "copilot", Arguments = "--acp",
+                FileName = "copilot",
+                Arguments = "--acp",
                 // opencode installs as cmd / bat file on Windows, watch out for that
                 UseShellExecute = false,
                 CreateNoWindow = true,

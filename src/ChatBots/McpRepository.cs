@@ -67,7 +67,7 @@ class McpRepository
             {
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Required()
             }));
-        
+
         Console.WriteLine($"\n\n{prompt}\n{result}");
     }
 }

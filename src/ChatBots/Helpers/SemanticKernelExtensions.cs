@@ -1,10 +1,10 @@
 ﻿using Microsoft.KernelMemory;
-using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace Helpers
 {

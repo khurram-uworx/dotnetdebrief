@@ -4,7 +4,6 @@ using Dapplo.Jira.Query;
 using Microsoft.SemanticKernel;
 using System;
 using System.ComponentModel;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ChatBots.Plugins;
@@ -87,16 +86,16 @@ class JiraPlugin
     [Description("Get details of a Jira issue")]
     public async Task<string> GetIssue(
         [Description("Issue key, e.g., 'PROJ-123'")] string issueKey)
-        //[Description("Fields to return (comma-separated, '*all' for all). Example: 'summary,status'")] string fields = "",
-        //[Description("Optional: expand fields (e.g., 'renderedFields', 'changelog')")] string? expand = null,
-        //[Description("Max number of comments (0 = none). Default: 10")] int commentLimit = 10,
-        //[Description("Optional: issue properties to return (comma-separated)")] string? properties = null,
-        //[Description("Optional: update issue view history (default: true)")] bool updateHistory = true)
+    //[Description("Fields to return (comma-separated, '*all' for all). Example: 'summary,status'")] string fields = "",
+    //[Description("Optional: expand fields (e.g., 'renderedFields', 'changelog')")] string? expand = null,
+    //[Description("Max number of comments (0 = none). Default: 10")] int commentLimit = 10,
+    //[Description("Optional: issue properties to return (comma-separated)")] string? properties = null,
+    //[Description("Optional: update issue view history (default: true)")] bool updateHistory = true)
     {
         var result = await this.jira.Issue.SearchAsync(Where.IssueKey.Is(issueKey));
         foreach (var issue in result)
             return issue.ToString();
-            //return JsonSerializer.Serialize(issue, new JsonSerializerOptions { WriteIndented = true });
+        //return JsonSerializer.Serialize(issue, new JsonSerializerOptions { WriteIndented = true });
 
         return $"{issueKey} not found";
     }
@@ -149,9 +148,9 @@ class JiraPlugin
         [Description("Issue key, e.g., 'PROJ-123'")] string issueKey,
         [Description("Time spent, e.g., '1h 30m', '1d', '30m'")] string timeSpent,
         [Description("Optional: comment in Markdown")] string? comment = null)
-        //[Description("Optional: start time ISO format, e.g., '2023-08-01T12:00:00Z'")] string? started = null,
-        //[Description("Optional: new original estimate")] string? originalEstimate = null,
-        //[Description("Optional: new remaining estimate")] string? remainingEstimate = null)
+    //[Description("Optional: start time ISO format, e.g., '2023-08-01T12:00:00Z'")] string? started = null,
+    //[Description("Optional: new original estimate")] string? originalEstimate = null,
+    //[Description("Optional: new remaining estimate")] string? remainingEstimate = null)
     {
         var worklog = new Worklog { TimeSpent = timeSpent };
         if (comment != null) worklog.Comment = comment;

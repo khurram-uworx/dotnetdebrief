@@ -19,7 +19,7 @@ namespace ChatBots;
 class SkAgentTicketHandler
 {
     //https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-chat
-    
+
     //https://github.com/microsoft/semantic-kernel/blob/main/dotnet/samples/GettingStartedWithAgents/Step02_Plugins.cs
 
     //Updates : https://devblogs.microsoft.com/semantic-kernel/semantic-kernel-agent-framework-rc2/
