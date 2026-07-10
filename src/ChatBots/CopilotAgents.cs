@@ -46,6 +46,7 @@ static class CopilotAgents
 
         await using var copilotClient = new CopilotClient();
         await copilotClient.StartAsync();
+        var models = await copilotClient.ListModelsAsync();
 
         //var done = new TaskCompletionSource(); // we can await done.Task;
         //copilotClient.On(evt =>
@@ -74,13 +75,20 @@ static class CopilotAgents
                 //});
                 return PermissionDecision.ApproveOnce();
             },
+            //Model = "auto",
+            Streaming = true,
             WorkingDirectory = workFolder,
             Tools = [requirementsTool]
         };
 
+        var prompt = "You are UI Developer, lets do the ticket TICKT-1";
+
+        await using var session = await copilotClient.CreateSessionAsync(sessionConfig);
+        var response = await session.SendAndWaitAsync(new MessageOptions { Prompt = prompt });
+
         //https://github.com/github/copilot-sdk/blob/main/docs/integrations/microsoft-agent-framework.md
-        AIAgent agent = copilotClient.AsAIAgent(sessionConfig);
-        var response = await agent.RunAsync("You are UI Developer, lets do the ticket TICKT-1");
+        //AIAgent agent = copilotClient.AsAIAgent(sessionConfig);
+        //var response = await agent.RunAsync(prompt);
 
         Console.WriteLine(response);
         Process.Start("notepad.exe", Path.Combine(workFolder, "index.html"));
