@@ -1,6 +1,4 @@
 ﻿#pragma warning disable SKEXP0001
-#pragma warning disable SKEXP0020
-#pragma warning disable SKEXP0050
 
 using ChatBots.Helpers;
 using ChatBots.Models;

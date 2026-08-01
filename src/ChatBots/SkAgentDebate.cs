@@ -1,5 +1,4 @@
-﻿#pragma warning disable SKEXP0001
-#pragma warning disable SKEXP0110
+﻿#pragma warning disable SKEXP0110
 
 using ChatBots.Helpers;
 using Microsoft.SemanticKernel;

@@ -1,6 +1,4 @@
-﻿#pragma warning disable GHCP001
-
-using AgentFramework;
+﻿using AgentFramework;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
@@ -10,9 +8,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace ChatBots;
+namespace ChatBots.AgentFramework;
 
-class Agents
+class WorkflowAgents
 {
     //https://devblogs.microsoft.com/dotnet/introducing-microsoft-agent-framework-preview/
 
@@ -26,20 +24,6 @@ class Agents
     [Description("Formats the story for display.")]
     static string FormatStory(string title, string author, string story) =>
         $"Title: {title}\nAuthor: {author}\n\n{story}";
-
-    static int getIntegerFromHuman(string prompt)
-    {
-        while (true)
-        {
-            Console.Write(prompt);
-
-            string? input = Console.ReadLine();
-            if (int.TryParse(input, out int value))
-                return value;
-
-            Console.WriteLine("Invalid input. Please enter a valid integer.");
-        }
-    }
 
     static ExternalResponse handleExternalRequest(ExternalRequest request)
     {
@@ -62,6 +46,20 @@ class Agents
         }
 
         throw new NotSupportedException($"Request {request.PortInfo.RequestType} is not supported");
+    }
+
+    static int getIntegerFromHuman(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+
+            string? input = Console.ReadLine();
+            if (int.TryParse(input, out int value))
+                return value;
+
+            Console.WriteLine("Invalid input. Please enter a valid integer.");
+        }
     }
 
     public static async Task WriterEditorAsync(string urlOllama, string model)
@@ -109,36 +107,6 @@ class Agents
 
         Console.WriteLine("\n\n\nWorkflow Response:");
         Console.WriteLine(workflowResponse.Text);
-    }
-
-    public static async Task AgentWorkflowExecutorAsync(string urlOllama, string model)
-    {
-        //https://github.com/microsoft/agent-framework/blob/main/dotnet/samples/GettingStarted/Workflows/Agents/CustomAgentExecutors/Program.cs
-        IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), model);
-
-        var sloganWriter = new SloganWriterExecutor("SloganWriter", chatClient);
-        var feedbackProvider = new FeedbackExecutor("FeedbackProvider", chatClient);
-
-        var workflow = new WorkflowBuilder(sloganWriter)
-
-            .AddEdge(sloganWriter, feedbackProvider)
-            .AddEdge(feedbackProvider, sloganWriter)
-
-            .WithOutputFrom(feedbackProvider)
-            .Build();
-
-        StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow,
-            input: "Create a slogan for a new electric SUV that is affordable and " +
-            "fun to drive.");
-
-        await foreach (WorkflowEvent evt in run.WatchStreamAsync())
-        {
-            if (evt is SloganGeneratedEvent or FeedbackEvent) // Custom events to allow us to monitor the progress of the workflow.
-                Console.WriteLine($"{evt}");
-
-            if (evt is WorkflowOutputEvent outputEvent)
-                Console.WriteLine($"{outputEvent}");
-        }
     }
 
     public static async Task WorkflowHumanCheckpointAsync()

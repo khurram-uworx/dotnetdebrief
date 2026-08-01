@@ -1,4 +1,5 @@
 ﻿using ChatBots.Acp;
+using ChatBots.AgentFramework;
 using ChatBots.OpenCode;
 using System;
 using System.Collections.Generic;
@@ -45,11 +46,11 @@ static class Program
         options.Add(3, () => OpenAITools.ChatWithTools(inferenceUrl, inferenceKey, textModel));
 
         Console.WriteLine("[4] Microsoft Agent Framework : Writer - Editor");
-        options.Add(4, () => Agents.WriterEditorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
+        options.Add(4, () => WorkflowAgents.WriterEditorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
         Console.WriteLine("[5] Microsoft Agent Framework : Slogan - Feedback Iterations");
         options.Add(5, () => Agents.AgentWorkflowExecutorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
         Console.WriteLine("[6] Microsoft Agent Framework : Human in Loop and Checkpoint");
-        options.Add(6, () => Agents.WorkflowHumanCheckpointAsync().Wait());
+        options.Add(6, () => WorkflowAgents.WorkflowHumanCheckpointAsync().Wait());
         Console.WriteLine("[7] Copilot: Custom Tool");
         options.Add(7, () => CopilotAgents.CopilotAgentWithToolsAsync().Wait());
         Console.WriteLine("[8] Copilot: ACP");

@@ -1,6 +1,4 @@
-﻿#pragma warning disable SKEXP0001
-
-using ChatBots.Helpers;
+﻿using ChatBots.Helpers;
 using Microsoft.SemanticKernel;
 using ModelContextProtocol.Client;
 using System;

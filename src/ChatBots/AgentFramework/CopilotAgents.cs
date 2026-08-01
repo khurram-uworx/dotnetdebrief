@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace ChatBots;
+namespace ChatBots.AgentFramework;
 
 static class CopilotAgents
 {
