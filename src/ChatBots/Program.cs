@@ -45,16 +45,26 @@ static class Program
         Console.WriteLine("[3] OptionAI Tools");
         options.Add(3, () => OpenAITools.ChatWithTools(inferenceUrl, inferenceKey, textModel));
 
-        Console.WriteLine("[4] Microsoft Agent Framework : Writer - Editor");
-        options.Add(4, () => WorkflowAgents.WriterEditorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
-        Console.WriteLine("[5] Microsoft Agent Framework : Slogan - Feedback Iterations");
-        options.Add(5, () => Agents.AgentWorkflowExecutorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
+        Console.WriteLine("[4] Microsoft Agent Framework : Slogan - Feedback Iterations");
+        options.Add(4, () => Agents.AgentWorkflowExecutorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
+
+        Console.WriteLine("[5] Microsoft Agent Framework : Writer - Editor");
+        options.Add(5, () => WorkflowAgents.WriterEditorAsync(inferenceUrl, model: "llama3.2:1b").Wait()); // giving it a light model
         Console.WriteLine("[6] Microsoft Agent Framework : Human in Loop and Checkpoint");
         options.Add(6, () => WorkflowAgents.WorkflowHumanCheckpointAsync().Wait());
-        Console.WriteLine("[7] Copilot: Custom Tool");
-        options.Add(7, () => CopilotAgents.CopilotAgentWithToolsAsync().Wait());
-        Console.WriteLine("[8] Copilot: ACP");
-        options.Add(8, () => AcpLauncher.LaunchCodingAgentAsync().Wait());
+        Console.WriteLine("[7] Microsoft Agent Framework: Harness");
+        options.Add(7, () => HarnessAgents.RunHarnessAsync(inferenceUrl, model: "qwen3:0.6b").Wait());
+        //options.Add(7, () =>
+        //{
+        //    using var client = new OpenCodeClient();
+        //    var chatClient = new OpenCodeChatClient(client);
+        //    HarnessAgents.RunHarnessAsync(chatClient).Wait();
+        //});
+
+        Console.WriteLine("[8] Copilot: Custom Tool");
+        options.Add(8, () => CopilotAgents.CopilotAgentWithToolsAsync().Wait());
+        Console.WriteLine("[9] Copilot: ACP");
+        options.Add(9, () => AcpLauncher.LaunchCodingAgentAsync().Wait());
 
         Console.WriteLine("[11] Semantic Kernel (SK) Hello World");
         options.Add(11, () => SemanticKernelChats.HelloWorldAsync(inferenceUrl, textModel).Wait());
