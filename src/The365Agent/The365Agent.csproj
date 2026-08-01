@@ -8,12 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="AdaptiveCards" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Bcl.Memory" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="10.0.10" />
     <PackageReference Include="Microsoft.SemanticKernel.Agents.AzureAI" Version="1.78.0-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.78.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.78.0" />
-    <PackageReference Include="Microsoft.Agents.Authentication.Msal" Version="1.7.25-beta" />
-    <PackageReference Include="Microsoft.Agents.Hosting.AspNetCore" Version="1.7.25-beta" />
+    <PackageReference Include="Microsoft.Agents.Authentication.Msal" Version="1.7.123" />
+    <PackageReference Include="Microsoft.Agents.Hosting.AspNetCore" Version="1.7.123" />
   </ItemGroup>
 
   <!-- Exclude local settings from publish -->

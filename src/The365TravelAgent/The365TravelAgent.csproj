@@ -11,14 +11,14 @@
     <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="AdaptiveCards" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Agents.AI" Version="1.13.0" />
-    <PackageReference Include="Microsoft.Agents.M365Copilot.Beta" Version="1.0.0-preview.16" />
-    <PackageReference Include="Microsoft.Bcl.Memory" Version="10.0.9" />
-    <PackageReference Include="Microsoft.Extensions.AI" Version="10.7.0" />
-    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.7.0" />
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.16.0" />
+    <PackageReference Include="Microsoft.Agents.M365Copilot.Beta" Version="1.0.0-preview.18" />
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.8.3" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.8.3" />
     <PackageReference Include="Microsoft.Graph" Version="6.2.0" />
-    <PackageReference Include="Microsoft.Agents.Authentication.Msal" Version="1.7.25-beta" />
-    <PackageReference Include="Microsoft.Agents.Hosting.AspNetCore" Version="1.7.25-beta" />
+    <PackageReference Include="Microsoft.Agents.Authentication.Msal" Version="1.7.123" />
+    <PackageReference Include="Microsoft.Agents.Hosting.AspNetCore" Version="1.7.123" />
   </ItemGroup>
 
   <!-- Exclude local settings from publish -->

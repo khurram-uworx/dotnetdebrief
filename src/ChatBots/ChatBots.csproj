@@ -66,13 +66,13 @@
     <PackageReference Include="AutoGen" Version="0.2.3" />
     <PackageReference Include="Dapplo.Jira" Version="2.0.7" />
     <PackageReference Include="Gera.Chess" Version="1.2.0" />
-    <PackageReference Include="GitHub.Copilot.SDK" Version="1.0.7-preview.1" />
-    <PackageReference Include="Microsoft.Agents.AI" Version="1.13.0" />
-    <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.13.0" />
-    <PackageReference Include="Microsoft.Extensions.AI" Version="10.7.0" />
-    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.9" />
-    <PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" Version="10.7.0" />
+    <PackageReference Include="GitHub.Copilot.SDK" Version="1.0.8" />
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.16.0" />
+    <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.16.0" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.8.3" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.8.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" Version="10.8.0" />
     <PackageReference Include="Microsoft.KernelMemory.AI.Ollama" Version="0.98.250508.3" />
     <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.98.250508.3" />
     <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.98.250508.3" />
@@ -84,8 +84,8 @@
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.78.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.78.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Yaml" Version="1.78.0" />
-    <PackageReference Include="ModelContextProtocol" Version="2.0.0-preview.2" />
-    <PackageReference Include="OllamaSharp" Version="5.4.25" />
+    <PackageReference Include="ModelContextProtocol" Version="2.0.0" />
+    <PackageReference Include="OllamaSharp" Version="5.4.30" />
     <PackageReference Include="SmartComponents.LocalEmbeddings.SemanticKernel" Version="0.1.0-preview10148" />
   </ItemGroup>
 

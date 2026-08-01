@@ -5,9 +5,9 @@ using Anthropic.SDK.Messaging;
 using ComputerUse.Inputs;
 using ComputerUse.Scaling;
 using ComputerUse.ScreenCapture;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -214,17 +214,19 @@ class Program
 
     static string DownscaleScreenshot(byte[] screenshot, int scaledX, int scaledY)
     {
-        using var memoryStream = new MemoryStream(screenshot);
-        memoryStream.Position = 0; // Reset stream position
+        using var srcStream = new MemoryStream(screenshot);
+        using var src = new Bitmap(srcStream);
+        using var resized = new Bitmap(scaledX, scaledY);
+        using var g = Graphics.FromImage(resized);
+        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        g.DrawImage(src, 0, 0, scaledX, scaledY);
 
-        using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(memoryStream);
-        image.Mutate(x => x.Resize(scaledX, scaledY));
+        var jpegCodec = ImageCodecInfo.GetImageEncoders().First(c => c.FormatID == ImageFormat.Jpeg.Guid);
+        using var encoderParams = new EncoderParameters(1);
+        encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 75L);
 
         using var ms = new MemoryStream();
-        image.Save(ms, new JpegEncoder());
-        ms.Position = 0; // Reset stream position
-        //convert to byte 64 string
-        byte[] imageBytes = ms.ToArray();
-        return Convert.ToBase64String(imageBytes);
+        resized.Save(ms, jpegCodec, encoderParams);
+        return Convert.ToBase64String(ms.ToArray());
     }
 }
