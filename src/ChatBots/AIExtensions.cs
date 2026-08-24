@@ -67,7 +67,7 @@ static class AIExtensions
 
         // Weather conversation relevant to the registered function.
         chatHistory.Add(new ChatMessage(ChatRole.User,
-            "I live in Islamabad and I'm looking for a moderate intensity hike. What's the current weather like?"));
+            "I am in Islamabad and looking for a moderate intensity hike. What's the current weather like?"));
         Console.WriteLine($"{chatHistory.Last().Role} >>> {chatHistory.Last()}");
 
         ChatResponse response = await client.GetResponseAsync(chatHistory, chatOptions);

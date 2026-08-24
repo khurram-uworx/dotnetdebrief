@@ -1,6 +1,7 @@
 ﻿using ChatBots.Acp;
 using ChatBots.AgentFramework;
 using ChatBots.OpenCode;
+using ChatBots.ResumeScorer;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -95,6 +96,10 @@ static class Program
         options.Add(24, () => OpenCodeExamples.PlayChessAsync(new OpenCodeChatClient(new OpenCodeClient())).Wait());
         //Console.WriteLine("[25] AI Extensions Chat Completition and Tool");
         //options.Add(25, () => AIExtensionTools.ChatWithAIExtensionAsync(urlOllama, textModel).Wait());
+        Console.WriteLine("[25] Resume Scanner /w OpenCode");
+        //urlOllama, textModel
+        //        //IChatClient chatClient = new OllamaApiClient(new Uri(urlOllama), textModel);
+        options.Add(25, () => ResumeScorerBot.ScanFolderAsync(new OpenCodeChatClient(new OpenCodeClient()), @"E:\khurram-uworx\dotnetdebrief\SampleData").Wait());
 
         Console.WriteLine("[31] SK Agents - Ticket Handler");
         options.Add(31, () =>
