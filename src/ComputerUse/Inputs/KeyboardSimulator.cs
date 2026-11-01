@@ -1,5 +1,6 @@
 ﻿using SharpHook;
 using SharpHook.Data;
+using SharpHook.Simulation;
 using System;
 using System.Collections.Generic;
 
@@ -12,7 +13,7 @@ class KeyboardSimulator
         if (string.IsNullOrWhiteSpace(text))
             throw new ArgumentException("Text cannot be null or empty.");
 
-        IEventSimulator simulator = new EventSimulator();
+        IEventSimulator simulator = EventSimulator.Create(applicationName: "ComputerUser");
         simulator.SimulateTextEntry(text);
     }
 
@@ -24,7 +25,7 @@ class KeyboardSimulator
         // Split the key combination into individual keys
         var keys = keyCombination.Split(new[] { '+', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-        IEventSimulator simulator = new EventSimulator();
+        IEventSimulator simulator = EventSimulator.Create(applicationName: "ComputerUser");
 
         // Stack to keep track of keys pressed
         Stack<KeyCode> keysDown = new Stack<KeyCode>();

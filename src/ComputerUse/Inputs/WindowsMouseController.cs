@@ -1,5 +1,6 @@
 ﻿using SharpHook;
 using SharpHook.Data;
+using SharpHook.Simulation;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -100,7 +101,7 @@ class WindowsMouseController
     {
         var (virtualX, virtualY) = GetVirtualCoordinates(monitorIndex, x, y);
 
-        IEventSimulator simulator = new EventSimulator();
+        IEventSimulator simulator = EventSimulator.Create(applicationName: "ComputerUser");
 
         // Move the cursor to the specified position
         simulator.SimulateMouseMovement(Convert.ToInt16(virtualX), Convert.ToInt16(virtualY));
@@ -109,7 +110,7 @@ class WindowsMouseController
     // Method to perform a left-click at the current cursor position
     public static void LeftClick()
     {
-        IEventSimulator simulator = new EventSimulator();
+        IEventSimulator simulator = EventSimulator.Create(applicationName: "ComputerUser");
         simulator.SimulateMousePress(MouseButton.Button1);
         simulator.SimulateMouseRelease(MouseButton.Button1);
 
@@ -117,7 +118,7 @@ class WindowsMouseController
 
     public static void RightClick()
     {
-        IEventSimulator simulator = new EventSimulator();
+        IEventSimulator simulator = EventSimulator.Create(applicationName: "ComputerUser");
         simulator.SimulateMousePress(MouseButton.Button2);
         simulator.SimulateMouseRelease(MouseButton.Button2);
 

@@ -38,6 +38,9 @@ static class Program
         var options = new Dictionary<int, Action>();
         Console.WriteLine("Ensure your Ollama is up; choose your chat bot");
 
+        Console.WriteLine("[0] OllamaSharp Decision");
+        options.Add(0, () => OllamaSharp.RunSystemOneAsync(urlOllama, model: "tev1:0.8b").Wait());
+
         Console.WriteLine("[1] OllamaSharp Describe Image");
         options.Add(1, () => OllamaSharp.RunAsync(urlOllama, model: "gemma3").Wait()); // gemma3 has vision capabilities
 
